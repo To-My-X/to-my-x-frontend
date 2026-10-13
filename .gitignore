@@ -53,3 +53,13 @@ example
 # generated native folders
 /ios
 /android
+
+# shared agent instructions (override global Git ignore rules)
+!/AGENTS.md
+!/CLAUDE.md
+
+# shared skills only; keep personal Claude settings ignored
+!/.claude/
+/.claude/*
+!/.claude/skills/
+!/.claude/skills/**
