@@ -70,7 +70,8 @@
 - 작업 전후와 커밋 전 [문서 동기화](docs/harness/documentation-sync.md) 절차를 따릅니다.
 - [실수 기록](docs/harness/mistakes.md)의 재발 방지 규칙을 확인하고, 실제 실수와 검증 누락이 발생하면 기록합니다.
 - 역할별 책임과 Claude·Codex 교대는 [에이전트 운영 방식](docs/harness/agent-team.md)을 따릅니다.
-- 커밋할 때는 [커밋 컨벤션](docs/conventions/commit.md)을 읽고 메시지 작성과 목적별 분리 규칙을 따릅니다. 다른 컨벤션은 개발 중 필요에 따라 `docs/conventions/`에 추가합니다.
+- 커밋할 때는 [커밋 컨벤션](docs/conventions/commit.md)을 읽고 메시지 작성과 목적별 분리 규칙을 따릅니다.
+- 브랜치 생성·개발·병합은 [브랜치 운영 규칙](docs/conventions/branch.md)을 따릅니다. 일반 개발은 `develop`, 검증된 프로덕션 코드는 `main`에서 관리합니다. 다른 컨벤션은 필요에 따라 추가합니다.
 - 제품 명세는 기획·디자인 자료와 확정한 요구사항을 바탕으로 통합 스펙에 작성합니다. 훅·CI 등 자동화는 후속 작업에서 구성하며, 문서에 적힌 절차와 실제 설치된 도구를 구분합니다.
 
 ## 프로젝트 개요
