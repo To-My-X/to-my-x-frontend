@@ -79,7 +79,8 @@ Submit 성공은 공개 완료가 아닙니다. Google Play 초기 설정·검�
 | PR 원격 배포 차단·CI 앱 작업 없음 | YAML job·step 확인 | 통과 |
 | lint·타입 검사 성공 | npm run lint, npm run typecheck | 확인 중 |
 | 웹 정적 빌드 성공 | npm run build:web | 통과 |
-| 실제 배포·네이티브 빌드·제출 성공 | Actions·EAS·스토어 결과 | 초기 설정 미완료로 미실행 |
+| develop 웹 배포 성공 | Actions 38521762369 | 통과 |
+| main 웹 배포·앱 빌드·제출 | 각 대상의 실제 실행 | 미실행 |
 
 ## 변경 기록
 
@@ -88,4 +89,4 @@ Submit 성공은 공개 완료가 아닙니다. Google Play 초기 설정·검�
 ## CI 검증 기록 — 2026-10-14
 
 - 최초 실행 38521616720: lint 통과, 타입 검사 실패. Git에서 제외한 expo-env.d.ts에 CSS 타입 참조가 의존해 깨끗한 runner에서 실패했습니다.
-- src/types/expo.d.ts에 Expo 타입 참조를 추가해 생성 파일 없이도 검사하도록 수정했습니다. 재실행 결과는 Actions에서 확인합니다.
+- src/types/expo.d.ts에 Expo 타입 참조를 추가해 생성 파일 없이도 검사하도록 수정했습니다. 재실행 38521762369에서 lint·타입 검사·웹 빌드·artifact 업로드·EAS Hosting 배포가 모두 통과했습니다. 테스트 주소: https://to-my-x--develop.expo.app
