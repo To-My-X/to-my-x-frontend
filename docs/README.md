@@ -22,6 +22,7 @@ ToMyX의 명세와 작업 지식을 모으는 곳입니다. Claude Code와 Codex
 | [에이전트 운영](harness/agent-team.md) | 역할별 책임과 Claude·Codex 교대 절차 |
 | [인수인계](harness/handoff.md) | 다음 작업자가 바로 이어갈 수 있는 현재 상태 |
 | [커밋 컨벤션](conventions/commit.md) | 메시지 형식, 타입, 스코프, 목적별 커밋 분리 |
+| [빌드와 배포](specs/build-deploy.md) | 브랜치별 CI/CD와 EAS·스토어 초기 설정 |
 | [브랜치 운영 규칙](conventions/branch.md) | main·develop의 역할, 임시 브랜치, 배포·긴급 수정 흐름 |
 
 루트의 `README.md`, `AGENTS.md`, `CLAUDE.md`는 진입점으로 유지합니다. 상세 Markdown 문서는 `docs/`에 모읍니다.
@@ -35,7 +36,7 @@ ToMyX의 명세와 작업 지식을 모으는 곳입니다. Claude Code와 Codex
 - `skills/`: 프로젝트 공통 스킬 원본과 목록. 에이전트별 탐색 폴더에는 원본을 가리키는 링크를 둡니다.
 - 설치·실행 절차처럼 제품 스펙과 다른 목적의 문서는 필요할 때 `setup/`에 추가합니다. 아직 해당 문서는 없습니다.
 
-PRD, IA, Tech Spec을 별도 폴더나 파일로 나누지 않습니다. 같은 주제의 기획·흐름·구현 설계는 `specs/`의 한 파일에서 갱신합니다. 정책 원본은 `policy/`에서 관리하며 스펙에서 중복 정의하지 않습니다. 실제 제품 스펙은 아직 작성하지 않았으며, 양식과 운영 기준만 마련한 상태입니다.
+PRD, IA, Tech Spec을 별도 폴더나 파일로 나누지 않습니다. 같은 주제의 기획·흐름·구현 설계는 `specs/`의 한 파일에서 갱신합니다. 정책 원본은 `policy/`에서 관리하며 스펙에서 중복 정의하지 않습니다. 제품 화면·기능 스펙은 아직 없으며, 배포 명세와 양식·운영 기준을 마련했습니다.
 
 ## SDD 진행 방식
 
