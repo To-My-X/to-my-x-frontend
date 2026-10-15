@@ -2,39 +2,43 @@
 
 ## 현재 작업
 
-- 갱신일: 2026-10-14
-- 목적: 브랜치별 웹 자동 배포와 앱 릴리스 스킬 분리
-- 단계: develop 웹 CI/CD 실제 실행과 배포 성공
-- 브랜치: develop. 설정 5ce6012와 CI 수정 5ac2daa를 푸시했습니다. Actions 38521762369에서 배포를 확인했습니다.
-- 관련 문서: [빌드와 배포](../specs/build-deploy.md), [브랜치 규칙](../conventions/branch.md), [문서 목록](../README.md)
+- 갱신일: 2026-10-15
+- 목적: main의 앱 영향·fingerprint 판정과 테스트 배포 자동화
+- 단계: 로컬 자동화 검증 완료, Android testing 빌드 성공·수동 내부 테스트 출시 완료, iOS 준비 대기
+- 브랜치: develop. 이번 변경은 목적별 커밋으로 정리합니다. 원격 푸시와 main 반영은 별도 진행합니다.
+- 관련 문서: [앱 테스트 자동화](../specs/app-test-automation.md), [빌드·배포](../specs/build-deploy.md)
 
 ## 확정 사항
 
-- 웹은 EAS Hosting을 사용합니다. develop은 develop alias, main은 프로덕션 배포입니다.
-- 브랜치 반영 시에는 웹만 배포합니다. 앱은 app-release 스킬을 요청한 시점에 빌드·제출합니다. 기본 스토어 릴리스 소스는 main이며 제출 대상은 Google Play 내부 테스트·TestFlight입니다.
-- PR은 lint·타입 검사·웹 빌드만 수행하며 원격 배포·네이티브 빌드·제출은 하지 않습니다.
-- 브랜치 push는 병합과 직접 push를 모두 포함합니다. 앱 작업은 GitHub Actions에서 제거했습니다.
-- EAS 프로필·워크플로·초기 설정의 원본은 빌드와 배포 명세에서 확인합니다.
+- 웹은 develop 테스트·main 프로덕션 자동 배포를 유지합니다. develop 웹 배포는 기존 Actions 38521762369에서 확인했습니다.
+- 앱은 main에서만 테스트까지 자동화합니다. APP_TEST_ENABLED=true가 활성화 조건입니다.
+- 마지막 성공한 플랫폼별 배포와 비교해 앱 영향이 없으면 생략합니다. fingerprint가 같으면 testing OTA, 다르면 testing 빌드·Play 내부 테스트·TestFlight 제출입니다.
+- 프로덕션 앱·OTA는 사람이 app-release로 요청합니다. testing 채널의 바이너리를 그대로 공개하지 않습니다.
 
 ## 이번 변경과 검증
 
-- GitHub Actions는 웹만 실행합니다. app-release 스킬과 두 에이전트의 탐색 링크를 추가했습니다. EAS 환경·내부 테스트 제출 프로필은 스킬에서 사용합니다.
-- ESLint 설정과 의존성, typecheck·build:web 명령을 추가했습니다. 웹 테마 훅의 의도적인 hydration 상태 갱신 한 줄에 lint 예외와 이유를 기록했습니다.
-- lint와 타입 검사는 통과했습니다. YAML 파싱·프로필 분기 검사를 수행했습니다.
-- 앞선 웹 정적 빌드는 통과했습니다. 이번 변경 후 lint·타입 검사, 웹 전용 워크플로·셸 구문, 두 스킬 메타데이터·네 개 연결 링크와 문서 17개의 링크 72개를 확인했습니다.
-- 기본 Python 스킬 검증기는 Xcode 라이선스 오류로 실행하지 못해 Node YAML 파서와 경로 검사로 형식을 확인했습니다. 앱 스킬의 실제 빌드·제출은 실행하지 않았습니다.
-- develop 웹 배포는 Actions에서 확인했습니다. main 웹 프로덕션 배포와 앱 빌드·제출은 아직 실행하지 않았습니다.
-- 문서 동기화 리뷰에서 브랜치의 기존 수동 빌드 계획과 ESLint 미설정 안내를 현재 설정에 맞게 보완했습니다.
+- expo-updates와 fingerprint runtime 정책·업데이트 URL·채널을 구성했습니다.
+- 자동화 스크립트는 전용 상태 태그의 success·pending을 구분해 성공 기준과 제출 대기 빌드 ID를 보존합니다.
+- 앱 영향 판정·OTA·실패 복구 등 5개 Node 테스트가 통과했습니다. lint·타입·웹 빌드와 워크플로 구문·문서 링크 80개도 통과했습니다.
+- Android EAS testing 빌드와 fingerprint 설정 단계는 통과했습니다. 자동화 워크플로의 OTA·스토어 제출은 아직 검증하지 않았습니다.
 
-## 남은 설정
+## 직접 준비할 항목
 
-- EXPO_TOKEN 등록을 확인했습니다. 사용자가 Hosting 준비 완료를 확인했으며 이번 push로 실제 배포를 검증합니다.
-- EAS Hosting preview subdomain과 네이티브 서명 자격증명·개발용 iOS 기기 등록 상태는 확인되지 않았습니다.
-- App Store Connect 앱은 사용자 확인상 등록 전입니다. 앱 등록 후 eas.json에 ascAppId를 기록하고 EAS 제출 자격증명을 설정해야 합니다.
-- Google Play 앱·첫 수동 업로드·서비스 계정 설정도 확인되지 않았습니다.
-- 실제 제품 화면·기능 스펙과 브랜치 보호는 후속 작업입니다. 스킬은 에이전트 절차이며 CI에서 AI 문서 리뷰를 자동 실행하지 않습니다.
+- EAS 토큰의 Build·Update·Submit 권한과 preview·production 환경을 확인합니다.
+- 사용자 확인상 Android 첫 내부 테스트 수동 출시는 완료했습니다. Play 자동 제출 서비스 계정 설정은 별도 확인합니다. Apple 멤버십은 갱신했으며 반영 대기 중입니다. iOS 앱 등록·서명·API key·숫자 ascAppId와 TestFlight는 나중에 준비합니다.
+- TestFlight 그룹과 테스터, Play 내부 테스터를 설정합니다. 이전 OTA 미설정 앱은 최초 테스트 바이너리 설치가 필요합니다.
+- 준비 후 GitHub 변수 APP_TEST_ENABLED=true를 등록하고 전용 상태 태그 두 개의 쓰기를 허용합니다.
+- 상세 순서와 수동 프로덕션 전환은 앱 테스트 명세를 따릅니다. 커밋·main 반영·실제 배포는 별도 검증해야 합니다.
 
-## CI 검증 기록 — 2026-10-14
+## Android 로컬 빌드 진단 — 2026-10-15
 
-- 최초 실행 38521616720: lint 통과, 타입 검사 실패. Git에서 제외한 expo-env.d.ts에 CSS 타입 참조가 의존해 깨끗한 runner에서 실패했습니다.
-- src/types/expo.d.ts에 Expo 타입 참조를 추가해 생성 파일 없이도 검사하도록 수정했습니다. 재실행 38521762369에서 lint·타입 검사·웹 빌드·artifact 업로드·EAS Hosting 배포가 모두 통과했습니다. 테스트 주소: https://to-my-x--develop.expo.app
+- 사용자 로그의 40초 실패는 daemon-17039 로그와 일치하며 원인은 ANDROID_HOME 미설정에 따른 SDK location not found입니다. SDK 자체는 설치돼 있었습니다.
+- 이 PC의 .env.local에 검증한 SDK 경로를 기록했고 Expo 환경 로더로 로딩을 확인했습니다. 해당 파일은 Git 제외 상태입니다.
+- SDK·Node 경로를 명시한 재실행에서 SDK 탐색과 NDK 27.1.12297006·27.0.12077973 설치를 완료했습니다. 이후 mergeExtDexDebug의 Gradle 캐시 저장 중 classes3.dex 파일 모드 조회 실패로 종료됐습니다. APK 성공은 미확인이고 현재는 iOS 시작 오류를 우선 처리합니다.
+- lint·타입 검사는 통과했습니다. [로컬 개발 안내](../setup/android-local.md)에 SDK·Node·NDK 준비 방법을 기록했습니다.
+
+## iOS 시작 실패 진단 — 2026-10-15
+
+- Xcode 27.0·iOS 27 시뮬레이터에서 Scene 생명주기 누락으로 시작이 거부됐습니다. 기존 생성 프로젝트는 UIApplicationSceneManifest 없이 AppDelegate에서 window를 만들었습니다.
+- SDK 57 공식 지침에 따라 expo-build-properties의 ios.enableSceneSupport를 활성화하고 Expo prebuild로 iOS를 재생성했습니다. Scene manifest와 factory provider 채택·이전 startup 코드 제거를 확인했습니다.
+- iOS 재빌드 성공(0 errors), iPhone 18 Pro·iOS 27 시뮬레이터 설치·실행과 실행 프로세스를 확인했습니다. Scene 오류에 따른 즉시 종료가 해소됐습니다. lint·타입 검사·문서 링크 84개 검사도 통과했습니다. 기능 전체 검증이나 스토어 빌드는 실행하지 않았습니다. [iOS 개발 안내](../setup/ios-local.md)를 참조합니다.

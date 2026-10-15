@@ -64,7 +64,7 @@
 ## 하네스 운영 문서
 
 - 프로젝트 공통 스킬은 [스킬 목록](docs/skills/README.md)에서 확인합니다.
-- 앱 빌드·배포·릴리스 실행을 요청받으면 [app-release](docs/skills/app-release/SKILL.md)를 적용합니다. 브랜치 반영 시 CI는 웹만 배포하고, 앱 작업은 사용자가 요청한 플랫폼과 범위에서 수행합니다.
+- 앱 빌드·배포·릴리스 실행을 요청받으면 [app-release](docs/skills/app-release/SKILL.md)를 적용합니다. 웹은 브랜치별 자동 배포하고 앱은 [테스트 배포 명세](docs/specs/app-test-automation.md)에 따라 main에서 테스트까지만 자동화합니다. 앱 프로덕션은 사용자의 실행 요청 범위에서만 진행합니다.
 - 커밋 또는 웹·Android·iOS 빌드를 실행할 때마다, 명령 실행 전에 [문서 동기화 리뷰 스킬](docs/skills/documentation-review/SKILL.md)을 반드시 읽고 수행합니다. 사용자가 스킬을 직접 언급하지 않아도 적용합니다. 스킬의 `통과` 또는 `보완 완료` 판정 후 요청받은 작업을 진행합니다. 상세 범위와 재검토 기준은 스킬을 따릅니다.
 
 - 작업 시작과 교대 시 [인수인계](docs/harness/handoff.md)를 읽고, 종료 시 현재 상태와 다음 작업을 갱신합니다.

@@ -1,11 +1,15 @@
 ---
 name: app-release
-description: ToMyX 앱 릴리스 요청 시 EAS로 Android·iOS 앱을 빌드하고 요청 범위에 따라 Google Play 내부 테스트·TestFlight에 제출한다. 앱 개발용 빌드나 내부 배포 요청에도 사용한다. 웹 배포·일반 머지·릴리스 방식 설명만으로 원격 앱 작업을 시작하지 않는다.
+description: ToMyX 앱 릴리스 요청 시 EAS로 Android·iOS 앱을 빌드하고 요청 범위에 따라 Google Play 내부 테스트·TestFlight에 제출한다. 앱 개발용 빌드나 내부 배포 요청에도 사용한다. 프로덕션 OTA·공개 배포는 명시적 요청 시에만 수행하며, CI의 테스트 자동화 설정은 별도 명세를 따른다.
 ---
 
 # 앱 빌드와 배포
 
 경로는 저장소 루트를 기준으로 해석합니다. [빌드와 배포 명세](../../specs/build-deploy.md)와 `eas.json`을 읽고, 요청된 플랫폼·소스 버전·빌드 목적을 정합니다. 스킬 작성·수정 요청은 릴리스 실행 요청이 아닙니다.
+
+자동 테스트 배포의 상태·빌드 ID는 [앱 테스트 명세](../../specs/app-test-automation.md)와 플랫폼별 app-test 태그에서 확인합니다. testing 프로필 바이너리를 그대로 공개하면 testing 채널을 계속 받으므로 프로덕션 공개용으로 승격하지 않습니다. production 프로필로 다시 만들고 채널·환경을 확인합니다.
+
+프로덕션 OTA 요청이면 마지막 production 바이너리와 fingerprint 호환성을 확인하고 production 환경에서 export해 production 채널에 publish합니다. 테스트 preview 환경의 OTA를 그대로 옮기지 않습니다. 불호환이면 바이너리 릴리스로 전환해야 함을 설명합니다. 공개 스토어 출시·심사는 사용자가 요청한 범위에서 별도 확인합니다.
 
 ## 요청을 실행 범위로 정하기
 

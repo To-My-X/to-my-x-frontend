@@ -13,6 +13,8 @@ ToMyX의 명세와 작업 지식을 모으는 곳입니다. Claude Code와 Codex
 
 | 문서 | 역할 |
 | --- | --- |
+| [Android 로컬 개발](setup/android-local.md) | SDK·Node 경로와 NDK 준비, 로컬 빌드 오류 확인 |
+| [iOS 로컬 개발](setup/ios-local.md) | Xcode·시뮬레이터와 SDK 57 Scene 설정 |
 | [프로젝트 스킬](skills/README.md) | 공통 스킬 목록, 실행 조건과 에이전트 연결 방식 |
 | [정책 관리](policy/README.md) | 서비스 기획·로직·내부 규칙과 의도·근거를 기록하는 기준과 목록 |
 | [통합 스펙 관리](specs/README.md) | 정책·화면·기능별 구현 명세의 작성 기준과 목록 |
@@ -22,6 +24,7 @@ ToMyX의 명세와 작업 지식을 모으는 곳입니다. Claude Code와 Codex
 | [에이전트 운영](harness/agent-team.md) | 역할별 책임과 Claude·Codex 교대 절차 |
 | [인수인계](harness/handoff.md) | 다음 작업자가 바로 이어갈 수 있는 현재 상태 |
 | [커밋 컨벤션](conventions/commit.md) | 메시지 형식, 타입, 스코프, 목적별 커밋 분리 |
+| [앱 테스트 자동화](specs/app-test-automation.md) | 변경 감지·테스트 OTA·내부 테스트와 직접 준비할 설정 |
 | [빌드와 배포](specs/build-deploy.md) | 브랜치별 CI/CD와 EAS·스토어 초기 설정 |
 | [브랜치 운영 규칙](conventions/branch.md) | main·develop의 역할, 임시 브랜치, 배포·긴급 수정 흐름 |
 
@@ -34,7 +37,7 @@ ToMyX의 명세와 작업 지식을 모으는 곳입니다. Claude Code와 Codex
 - `conventions/`: 코드 작성과 협업 규칙. 현재는 커밋·브랜치 규칙을 관리하며, 다른 규칙은 필요할 때 추가합니다.
 - `harness/`: 에이전트 운영, 문서 동기화, 실수 기록과 인수인계.
 - `skills/`: 프로젝트 공통 스킬 원본과 목록. 에이전트별 탐색 폴더에는 원본을 가리키는 링크를 둡니다.
-- 설치·실행 절차처럼 제품 스펙과 다른 목적의 문서는 필요할 때 `setup/`에 추가합니다. 아직 해당 문서는 없습니다.
+- `setup/`: SDK·로컬 실행 환경과 설치·빌드 준비 절차를 관리합니다.
 
 PRD, IA, Tech Spec을 별도 폴더나 파일로 나누지 않습니다. 같은 주제의 기획·흐름·구현 설계는 `specs/`의 한 파일에서 갱신합니다. 정책 원본은 `policy/`에서 관리하며 스펙에서 중복 정의하지 않습니다. 제품 화면·기능 스펙은 아직 없으며, 배포 명세와 양식·운영 기준을 마련했습니다.
 

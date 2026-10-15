@@ -11,15 +11,15 @@
 
 ## 목적과 범위 — PRD
 
-브랜치 반영 시 웹 검사·빌드·배포를 자동화합니다. 앱 바이너리는 [app-release 스킬](../skills/app-release/SKILL.md)을 요청할 때 빌드·제출합니다.
+브랜치 반영 시 웹 검사·빌드·배포를 자동화합니다. 앱은 main에서 [테스트 배포 자동화](app-test-automation.md)로 변경을 판정합니다. 앱 프로덕션 릴리스는 사람이 [app-release 스킬](../skills/app-release/SKILL.md)로 요청합니다.
 
 | 대상 | 웹 | Android | iOS |
 | --- | --- | --- | --- |
 | develop | 정적 빌드와 EAS Hosting develop alias 배포 | 자동 실행 없음 | 자동 실행 없음 |
-| main | 정적 빌드와 EAS Hosting 프로덕션 배포 | 자동 실행 없음 | 자동 실행 없음 |
+| main | 정적 빌드와 EAS Hosting 프로덕션 배포 | 변경 판정 후 테스트 OTA 또는 Play 내부 테스트 | 변경 판정 후 테스트 OTA 또는 TestFlight |
 | 두 브랜치 대상 PR | 검사와 정적 빌드 결과 보관 | 실행 없음 | 실행 없음 |
 
-스토어 공개·심사 제출과 OTA 업데이트는 이번 범위에 포함하지 않습니다. development 앱은 개발 서버에 연결하는 클라이언트입니다. 서버 없이 실행할 내부 테스트 앱은 기존 preview 프로필을 별도 사용합니다.
+앱 테스트 자동화의 설정·판정·수동 프로덕션 절차는 [별도 명세](app-test-automation.md)를 따릅니다. 자동 스토어 공개·심사 제출은 포함하지 않습니다. development 앱은 개발 서버에 연결하는 클라이언트입니다. 서버 없이 실행할 내부 테스트 앱은 기존 preview 프로필을 별도 사용합니다.
 
 ## 실행 흐름 — IA
 
@@ -29,7 +29,7 @@
 
 - push는 병합뿐 아니라 직접 푸시도 포함합니다. 검사가 실패하면 후속 작업을 실행하지 않습니다.
 - 웹 빌드 결과 dist를 Actions artifact로 보관한 뒤 develop은 alias, main은 프로덕션 URL에 배포합니다.
-- 앱은 머지와 관계없이 요청한 플랫폼·소스·프로필로 스킬에서 실행합니다. 스토어 릴리스의 기본 소스는 main입니다. 성공한 이번 빌드 ID만 제출하며 `--latest`는 사용하지 않습니다.
+- 앱 테스트 배포는 main에서 enable 변수와 마지막 성공 기준에 따라 실행합니다. 수동 앱 릴리스도 가능하며, 기본 소스는 main입니다. 성공한 이번 빌드 ID만 제출하며 `--latest`는 사용하지 않습니다.
 - 같은 브랜치의 실행은 직렬화합니다. 실행 중인 작업은 취소하지 않습니다. GitHub concurrency는 여러 대기 실행 중 이전 대기 실행을 대체할 수 있으므로 모든 중간 커밋의 빌드를 보장하는 큐가 아닙니다.
 - 수동 실행은 develop·main에서 가능합니다. 다른 브랜치에서는 검사와 웹 빌드만 수행합니다.
 
@@ -76,8 +76,8 @@ Submit 성공은 공개 완료가 아닙니다. Google Play 초기 설정·검�
 | 조건 | 검증 방법 | 현재 결과 |
 | --- | --- | --- |
 | 브랜치별 빌드·배포 대상 일치 | YAML·프로필·분기 검사 | 통과 |
-| PR 원격 배포 차단·CI 앱 작업 없음 | YAML job·step 확인 | 통과 |
-| lint·타입 검사 성공 | npm run lint, npm run typecheck | 확인 중 |
+| PR 원격 배포·앱 작업 차단 | YAML job·step 확인 | 통과 |
+| lint·타입 검사 성공 | npm run lint, npm run typecheck | 통과 |
 | 웹 정적 빌드 성공 | npm run build:web | 통과 |
 | develop 웹 배포 성공 | Actions 38521762369 | 통과 |
 | main 웹 배포·앱 빌드·제출 | 각 대상의 실제 실행 | 미실행 |

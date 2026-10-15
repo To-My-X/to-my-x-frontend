@@ -22,7 +22,13 @@
     },
     "production": {
       "autoIncrement": true,
-      "environment": "production"
+      "environment": "production",
+      "channel": "production"
+    },
+    "testing": {
+      "extends": "production",
+      "channel": "testing",
+      "environment": "preview"
     }
   },
   "submit": {
@@ -32,6 +38,13 @@
         "releaseStatus": "completed"
       },
       "ios": {}
+    },
+    "testing": {
+      "extends": "production",
+      "android": {
+        "track": "internal",
+        "releaseStatus": "completed"
+      }
     }
   }
 }

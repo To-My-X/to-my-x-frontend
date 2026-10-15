@@ -1,4 +1,4 @@
-name: Web build and deploy
+name: Build and deploy
 
 on:
   pull_request:
@@ -32,6 +32,7 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+      - run: node --test scripts/app-test-release.test.mjs
 
   web:
     needs: check
@@ -65,3 +66,28 @@ jobs:
           else
             npx --yes eas-cli@latest deploy --alias develop --non-interactive
           fi
+
+  app-test:
+    needs: check
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.APP_TEST_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [android, ios]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Detect app changes and release to testers
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: node scripts/app-test-release.mjs ${{ matrix.platform }}

@@ -53,3 +53,5 @@ PRD·IA·Tech Spec은 문서 안의 관점이며 별도 산출물로 나누지 �
 | --- | --- | --- |
 
 | [브랜치별 빌드와 배포](build-deploy.md) | 개발 환경·배포 흐름 | GitHub Actions와 EAS 빌드·배포·제출 |
+
+| [앱 테스트 자동화](app-test-automation.md) | 배포 흐름·기술 설계 | 변경 판정과 테스트 OTA·바이너리 배포 |

@@ -30,7 +30,7 @@ Codex 환경에서 임시 브랜치에 `codex/` 접두사가 필요하면 `codex
 
 ## CI/CD 적용 범위
 
-[빌드와 배포 명세](../specs/build-deploy.md)를 따릅니다. develop 반영 후 웹 테스트 배포, main 반영 후 웹 프로덕션 배포를 자동 실행합니다. 직접 push도 같은 자동화를 실행합니다. 앱 빌드·제출은 [app-release 스킬](../skills/app-release/SKILL.md)로 요청한 시점에 수행합니다.
+[빌드와 배포 명세](../specs/build-deploy.md)를 따릅니다. develop 반영 후 웹 테스트 배포, main 반영 후 웹 프로덕션 배포를 자동 실행합니다. 직접 push도 같은 자동화를 실행합니다. main에서는 [앱 테스트 자동화](../specs/app-test-automation.md)가 변경을 판정해 테스트 배포합니다. 앱 프로덕션은 [app-release 스킬](../skills/app-release/SKILL.md)로 사람이 요청한 시점에만 진행합니다.
 
 워크플로 파일은 구성하되 실제 활성화에는 Expo 토큰과 Hosting·서명·스토어 초기 설정이 필요합니다. 브랜치 보호와 필수 검사 설정은 아직 구성하지 않았습니다.
 
