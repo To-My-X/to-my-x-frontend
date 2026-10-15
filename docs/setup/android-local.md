@@ -32,3 +32,9 @@ SDK Manager → SDK Tools → Show Package Details → NDK (Side by side)에서 
 `BUILD FAILED`와 Expo의 non-zero code 요약보다 앞에 나오는 `What went wrong`를 확인합니다. 필요하면 Gradle 상세 로그나 `~/.gradle/daemon/<버전>/daemon-*.out.log`를 사용합니다.
 
 `android/`는 Expo가 생성하는 디렉터리이므로 해결을 위해 Gradle 파일을 임의로 수정하지 않습니다. 로컬 경로와 비밀값은 커밋하지 않습니다.
+
+## EAS에서 runtime fingerprint 불일치
+
+로컬 빌드나 IDE 도구가 node_modules 안에 Gradle wrapper·local.properties를 추가하거나 네이티브 소스를 수정하면 EAS의 깨끗한 설치와 fingerprint가 달라질 수 있습니다. 2026-10-15 빌드 6e0f0b4e-c350-4b56-a890-5403a521e72b에서 masked-view Manifest 변경과 3개 의존성의 로컬 생성 파일을 확인했습니다.
+
+해결은 잠금 파일을 유지한 npm ci로 의존성을 원본으로 복원하는 것입니다. 패키지의 네이티브 소스를 fingerprint에서 통째로 제외하거나 호환성 검사를 끄지 않습니다. .fingerprintignore는 머신별 node_modules 내부 local.properties만 제외합니다. 패키지 소스를 의도적으로 수정해야 한다면 재현 가능한 패치로 관리합니다.

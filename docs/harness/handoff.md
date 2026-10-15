@@ -42,3 +42,9 @@
 - Xcode 27.0·iOS 27 시뮬레이터에서 Scene 생명주기 누락으로 시작이 거부됐습니다. 기존 생성 프로젝트는 UIApplicationSceneManifest 없이 AppDelegate에서 window를 만들었습니다.
 - SDK 57 공식 지침에 따라 expo-build-properties의 ios.enableSceneSupport를 활성화하고 Expo prebuild로 iOS를 재생성했습니다. Scene manifest와 factory provider 채택·이전 startup 코드 제거를 확인했습니다.
 - iOS 재빌드 성공(0 errors), iPhone 18 Pro·iOS 27 시뮬레이터 설치·실행과 실행 프로세스를 확인했습니다. Scene 오류에 따른 즉시 종료가 해소됐습니다. lint·타입 검사·문서 링크 84개 검사도 통과했습니다. 기능 전체 검증이나 스토어 빌드는 실행하지 않았습니다. [iOS 개발 안내](../setup/ios-local.md)를 참조합니다.
+
+## EAS Android production 실패 — 2026-10-15
+
+- 빌드 6e0f0b4e-c350-4b56-a890-5403a521e72b는 Configure expo-updates에서 로컬·클라우드 runtime fingerprint 불일치로 실패했습니다. 환경변수 없음 안내가 직접 원인은 아닙니다.
+- 동일 버전 npm 원본을 임시 폴더에 받아 비교했고, 4개 의존성의 원본 해시가 EAS 로그의 해시와 정확히 일치했습니다. 로컬 masked-view AndroidManifest에서 package 속성이 제거됐고 나머지 패키지에는 wrapper·SDK 경로 파일이 추가돼 있었습니다.
+- npm ci로 원본 의존성 복원, .fingerprintignore에서 머신별 local.properties만 제외했습니다. 원본 4개 의존성의 해시 일치, SDK 경로 제외·Manifest 변경 감지, lint·타입 검사를 통과했습니다. 사용자 목적이 첫 내부 테스트 수동 업로드임을 확인해 testing 프로필로 dd216c2f-a799-4ec6-8e75-3396929fae61 빌드가 FINISHED로 성공했고 testing 채널·AAB 생성을 확인했습니다. 에이전트는 제출하지 않았으며, 사용자가 Android 내부 테스트 수동 출시 완료를 확인했습니다.

@@ -56,3 +56,11 @@
 - 조치와 현재 상태: src/types/expo.d.ts에 Expo 타입을 참조해 깨끗한 runner에서도 읽도록 수정했습니다. 생성 파일을 제거한 로컬 검사와 Actions check job이 통과했습니다.
 - 재발 방지 규칙: CI 최초 연결 시 생성·무시된 파일에 의존하는 검증을 확인하고 깨끗한 환경에서 검사합니다. 자동 생성 파일을 무조건 Git에 추가하지 않습니다.
 - 검증 방법과 결과: expo-env.d.ts가 없는 상태에서 npm run typecheck 통과. Actions 실행 38521762369의 check job 통과.
+
+### 2026-10-15: fingerprint 자동화에서 로컬 의존성 변형을 검증하지 않음
+
+- 상황과 영향: 로컬 Android 작업 후 변형된 node_modules의 fingerprint로 EAS production 빌드를 요청해 Configure expo-updates 단계에서 실패했습니다.
+- 원인: 로컬 의존성에 추가된 Gradle wrapper·SDK 파일과 수정된 Manifest를 깨끗한 npm 설치와 비교하지 않았습니다.
+- 조치: 동일 잠금 버전 원본과 파일 단위 비교 후 npm ci로 복원하고 머신별 local.properties만 fingerprint에서 제외했습니다.
+- 재발 방지: 런타임 불일치는 로그의 source diff를 확인하고 원본 패키지와 대조합니다. 네이티브 소스·패키지 전체를 무시해 해결하지 않습니다.
+- 검증: 원본 4개 패키지의 해시가 실패한 EAS 로그의 클라우드 해시와 일치함을 확인했습니다. 수정 후 testing 빌드 dd216c2f-a799-4ec6-8e75-3396929fae61가 성공했습니다. 사용자가 Android 내부 테스트 수동 출시 완료를 확인했습니다.
