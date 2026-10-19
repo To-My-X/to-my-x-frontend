@@ -2,8 +2,8 @@
 
 - 유형: 배포 흐름·기술 설계
 - 명세 상태: 확정
-- 구현 상태: 로컬 구성 완료, 계정 설정과 실제 실행 대기
-- 갱신일: 2026-10-15
+- 구현 상태: main 신규 빌드·내부 테스트 자동 제출 검증 완료, OTA 자동 분기 실검증 대기
+- 갱신일: 2026-10-19
 - 확정 근거: main 반영 후 앱 업데이트 필요 여부를 판정하고 테스트 배포까지 자동화합니다. 앱 프로덕션 반영은 사람이 요청해 진행합니다.
 - 관련 문서: [웹·앱 배포](build-deploy.md), [앱 릴리스 스킬](../skills/app-release/SKILL.md)
 
@@ -60,4 +60,11 @@
 
 - 단위 테스트: 문서·웹 변경 생략, 공통 변경 판정, 호환 OTA, 첫 빌드와 제출 실패 복구, OTA·빌드 실패 시 기준 유지.
 - 로컬 검증: Node 테스트 5개, lint·타입 검사·웹 export 통과. 워크플로 YAML·셸 구문·테스트/프로덕션 채널 분리·문서 링크 80개 확인.
-- 실제 Android testing 빌드: dd216c2f-a799-4ec6-8e75-3396929fae61 성공, 사용자 수동 내부 테스트 출시 완료. 자동화 워크플로의 OTA·스토어 제출과 iOS TestFlight는 미검증입니다.
+- 실제 Android testing 빌드: dd216c2f-a799-4ec6-8e75-3396929fae61 성공, 사용자 수동 내부 테스트 출시 완료. 이후 2026-10-19 CI에서 두 플랫폼 새 빌드·스토어 제출도 검증했습니다. OTA 자동 분기는 미검증입니다.
+
+### 실제 CI 검증 — 2026-10-19
+
+- PR #1 main 병합 SHA 13179dbc198779367a8cf880411b88fccd51818d, Actions [39209084419](https://github.com/To-My-X/to-my-x-frontend/actions/runs/39209084419) 전체 성공.
+- Android 새 testing AAB 빌드와 [Play 내부 테스트 제출](https://expo.dev/accounts/to-my-x/projects/to-my-x/submissions/58db4cac-b651-414d-a39c-4c73858f213b) 성공.
+- iOS 새 testing 빌드와 [TestFlight 제출](https://expo.dev/accounts/to-my-x/projects/to-my-x/submissions/498c8c2e-518d-47e8-8563-155ccf26dcbc) 성공.
+- 성공 기준 태그 두 개의 SHA·fingerprint·buildId와 pending=null을 확인했습니다. 다음 호환 변경의 OTA 자동 분기와 이번 새 버전 설치·실행은 별도 확인 대상입니다.

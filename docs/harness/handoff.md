@@ -2,10 +2,10 @@
 
 ## 현재 작업
 
-- 갱신일: 2026-10-15
+- 갱신일: 2026-10-19
 - 목적: main의 앱 영향·fingerprint 판정과 테스트 배포 자동화
-- 단계: 로컬 자동화 검증 완료, Android testing 빌드 성공·수동 내부 테스트 출시 완료, iOS 준비 대기
-- 브랜치: develop. 이번 변경은 목적별 커밋으로 정리합니다. 원격 푸시와 main 반영은 별도 진행합니다.
+- 단계: main 병합 후 웹 프로덕션·Android 내부 테스트·iOS TestFlight 자동 빌드와 제출 성공
+- 브랜치: develop. PR #1을 main에 merge commit으로 병합했고 develop에도 해당 이력을 반영했습니다.
 - 관련 문서: [앱 테스트 자동화](../specs/app-test-automation.md), [빌드·배포](../specs/build-deploy.md)
 
 ## 확정 사항
@@ -20,15 +20,15 @@
 - expo-updates와 fingerprint runtime 정책·업데이트 URL·채널을 구성했습니다.
 - 자동화 스크립트는 전용 상태 태그의 success·pending을 구분해 성공 기준과 제출 대기 빌드 ID를 보존합니다.
 - 앱 영향 판정·OTA·실패 복구 등 5개 Node 테스트가 통과했습니다. lint·타입·웹 빌드와 워크플로 구문·문서 링크 80개도 통과했습니다.
-- Android EAS testing 빌드와 fingerprint 설정 단계는 통과했습니다. 자동화 워크플로의 OTA·스토어 제출은 아직 검증하지 않았습니다.
+- Actions 39209084419에서 웹 배포와 Android·iOS 신규 testing 빌드·스토어 제출이 모두 성공했습니다. OTA 자동 분기는 아직 실검증하지 않았습니다.
 
 ## 직접 준비할 항목
 
 - EAS 토큰의 Build·Update·Submit 권한과 preview·production 환경을 확인합니다.
-- 사용자 확인상 Android 첫 내부 테스트 수동 출시는 완료했습니다. Play 자동 제출 서비스 계정 설정은 별도 확인합니다. Apple 멤버십은 갱신했으며 반영 대기 중입니다. iOS 앱 등록·서명·API key·숫자 ascAppId와 TestFlight는 나중에 준비합니다.
+- Android Play 제출용 서비스 계정과 iOS API key·서명·ascAppId 연결 및 실제 자동 제출을 확인했습니다.
 - TestFlight 그룹과 테스터, Play 내부 테스터를 설정합니다. 이전 OTA 미설정 앱은 최초 테스트 바이너리 설치가 필요합니다.
-- 준비 후 GitHub 변수 APP_TEST_ENABLED=true를 등록하고 전용 상태 태그 두 개의 쓰기를 허용합니다.
-- 상세 순서와 수동 프로덕션 전환은 앱 테스트 명세를 따릅니다. 커밋·main 반영·실제 배포는 별도 검증해야 합니다.
+- APP_TEST_ENABLED=true로 활성화했고 두 플랫폼 성공 기준 태그 쓰기도 실제 성공했습니다.
+- 상세 순서와 수동 프로덕션 전환은 앱 테스트 명세를 따릅니다. 다음 공통 코드 변경에서는 OTA 자동 분기와 설치 앱 반영을 검증합니다.
 
 ## Android 로컬 빌드 진단 — 2026-10-15
 
@@ -61,3 +61,18 @@
 - 사용자의 Google 서비스 계정 연결 완료 후 진행 요청에 따라 EAS의 Android Play 제출용 키 연결을 확인했습니다. iOS API 키와 서명은 앞서 확인했습니다.
 - PR #1의 check·web 검사는 통과했습니다. 문서 동기화 리뷰에서 오래된 Android 미연결 상태를 보완했습니다. APP_TEST_ENABLED=true 설정 후 merge commit으로 main에 반영해 최초 테스트 빌드·제출을 검증합니다.
 - 공개 앱 출시는 실행하지 않습니다. main 병합에 따라 웹 프로덕션 배포도 실행됩니다. 실제 CI 결과는 후속 기록합니다.
+
+## main 자동 배포 실행 — 2026-10-19
+
+- APP_TEST_ENABLED=true 활성화, PR #1 merge commit 13179dbc198779367a8cf880411b88fccd51818d로 main 반영. 해당 이력을 develop에도 반영·푸시했습니다.
+- Actions 실행: https://github.com/To-My-X/to-my-x-frontend/actions/runs/39209084419 . check 성공, 웹 배포와 앱 테스트 작업 진행 중입니다.
+- CI가 생성한 testing 빌드: Android 23d1ce55-34d3-4b7d-aec9-93f9b2dcb3b7, iOS a514910f-90c4-412d-a731-343132a0b65b. 두 빌드 모두 main 병합 SHA를 사용함을 확인했습니다. 최종 빌드·제출 결과는 아직 대기 중입니다.
+
+- 중간 결과: 웹 프로덕션 배포와 iOS app-test 작업 성공. iOS testing 빌드 a514910f-90c4-412d-a731-343132a0b65b FINISHED 및 CI의 제출 완료를 확인했고 app-test-ios 태그가 저장됐습니다. Android는 네이티브 CMake 컴파일 중입니다.
+
+## 자동화 최종 결과 — 2026-10-19
+
+- Actions 39209084419 전체 success: check·web·app-test (android)·app-test (ios) 모두 성공했습니다.
+- 소스 SHA: 13179dbc198779367a8cf880411b88fccd51818d. Android 빌드 23d1ce55-34d3-4b7d-aec9-93f9b2dcb3b7 → 내부 테스트 제출 58db4cac-b651-414d-a39c-4c73858f213b 성공. iOS 빌드 a514910f-90c4-412d-a731-343132a0b65b → TestFlight 제출 498c8c2e-518d-47e8-8563-155ccf26dcbc 성공.
+- 두 플랫폼 모두 build-submit 분기로 실행됐고 app-test 태그의 success SHA·fingerprint·buildId와 pending=null을 확인했습니다.
+- 이번 새 버전의 스토어 처리 완료·테스터 설치·실행은 직접 확인하지 않았습니다. 공개 앱 출시와 production OTA는 실행하지 않았습니다. 다음 공통 코드 변경에서는 testing OTA 분기와 설치 앱 반영을 별도로 검증합니다.
