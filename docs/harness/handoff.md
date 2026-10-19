@@ -48,3 +48,10 @@
 - 빌드 6e0f0b4e-c350-4b56-a890-5403a521e72b는 Configure expo-updates에서 로컬·클라우드 runtime fingerprint 불일치로 실패했습니다. 환경변수 없음 안내가 직접 원인은 아닙니다.
 - 동일 버전 npm 원본을 임시 폴더에 받아 비교했고, 4개 의존성의 원본 해시가 EAS 로그의 해시와 정확히 일치했습니다. 로컬 masked-view AndroidManifest에서 package 속성이 제거됐고 나머지 패키지에는 wrapper·SDK 경로 파일이 추가돼 있었습니다.
 - npm ci로 원본 의존성 복원, .fingerprintignore에서 머신별 local.properties만 제외했습니다. 원본 4개 의존성의 해시 일치, SDK 경로 제외·Manifest 변경 감지, lint·타입 검사를 통과했습니다. 사용자 목적이 첫 내부 테스트 수동 업로드임을 확인해 testing 프로필로 dd216c2f-a799-4ec6-8e75-3396929fae61 빌드가 FINISHED로 성공했고 testing 채널·AAB 생성을 확인했습니다. 에이전트는 제출하지 않았으며, 사용자가 Android 내부 테스트 수동 출시 완료를 확인했습니다.
+
+## main 앱 테스트 자동화 실검증 준비 — 2026-10-19
+
+- 사용자가 Android·iOS 수동 내부 테스트 빌드·배포 완료를 확인했고 main 병합 후 새 빌드·자동 제출 검증을 요청했습니다. iOS ascAppId 6824389886을 반영합니다.
+- GitHub APP_TEST_ENABLED 변수와 플랫폼 성공 기준 태그는 없는 상태입니다. 최초 실행은 새 바이너리를 빌드합니다.
+- EAS Android 서명은 준비됐지만 Play 제출용 Google 서비스 계정은 None assigned yet입니다. 연결 전에는 자동화를 활성화하지 않습니다. iOS는 EAS에 App Store Connect API Key와 유효한 배포 인증서·프로비저닝이 연결돼 있음을 확인했습니다.
+- lint·타입 검사와 자동화 테스트 5개 통과. 자격증명 확인 후 develop → main PR을 merge commit으로 반영하고 실행 결과를 기록합니다.
