@@ -37,6 +37,14 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
       ]
     ],
     "experiments": {
@@ -49,6 +57,12 @@
         "projectId": "2661f041-a390-4276-8689-8b210845db86"
       }
     },
-    "owner": "to-my-x"
+    "owner": "to-my-x",
+    "runtimeVersion": {
+      "policy": "fingerprint"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/2661f041-a390-4276-8689-8b210845db86"
+    }
   }
 }

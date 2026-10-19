@@ -1,0 +1,2 @@
+# 개발 PC의 SDK 경로는 네이티브 런타임을 바꾸지 않습니다.
+**/node_modules/**/local.properties

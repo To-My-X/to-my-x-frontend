@@ -1,5 +1,9 @@
 # to-my-x-frontend
 
+## 프로젝트 문서
+
+SDD와 에이전트 운영 문서는 [docs/README.md](docs/README.md)에서 확인합니다. Claude Code와 Codex의 공통 행동 원칙은 [AGENTS.md](AGENTS.md)를 따릅니다.
+
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
 ## Get started

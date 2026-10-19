@@ -1,0 +1,93 @@
+name: Build and deploy
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# 배포 순서가 뒤집히지 않도록 같은 브랜치의 실행을 직렬화합니다.
+concurrency:
+  group: build-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CI: '1'
+  EXPO_NO_TELEMETRY: '1'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: node --test scripts/app-test-release.test.mjs
+
+  web:
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build:web
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web-${{ github.sha }}
+          path: dist
+          if-no-files-found: error
+      - name: Deploy to EAS Hosting
+        if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main')
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          TARGET_BRANCH: ${{ github.ref_name }}
+        run: |
+          if [ -z "$EXPO_TOKEN" ]; then
+            echo "::error::GitHub secret EXPO_TOKEN is required."
+            exit 1
+          fi
+          if [ "$TARGET_BRANCH" = main ]; then
+            npx --yes eas-cli@latest deploy --prod --non-interactive
+          else
+            npx --yes eas-cli@latest deploy --alias develop --non-interactive
+          fi
+
+  app-test:
+    needs: check
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main' && vars.APP_TEST_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [android, ios]
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Detect app changes and release to testers
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: node scripts/app-test-release.mjs ${{ matrix.platform }}
