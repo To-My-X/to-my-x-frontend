@@ -55,3 +55,9 @@
 - GitHub APP_TEST_ENABLED 변수와 플랫폼 성공 기준 태그는 없는 상태입니다. 최초 실행은 새 바이너리를 빌드합니다.
 - EAS Android 서명은 준비됐지만 Play 제출용 Google 서비스 계정은 None assigned yet입니다. 연결 전에는 자동화를 활성화하지 않습니다. iOS는 EAS에 App Store Connect API Key와 유효한 배포 인증서·프로비저닝이 연결돼 있음을 확인했습니다.
 - lint·타입 검사와 자동화 테스트 5개 통과. 자격증명 확인 후 develop → main PR을 merge commit으로 반영하고 실행 결과를 기록합니다.
+
+## 자동화 활성화 — 2026-10-19
+
+- 사용자의 Google 서비스 계정 연결 완료 후 진행 요청에 따라 EAS의 Android Play 제출용 키 연결을 확인했습니다. iOS API 키와 서명은 앞서 확인했습니다.
+- PR #1의 check·web 검사는 통과했습니다. 문서 동기화 리뷰에서 오래된 Android 미연결 상태를 보완했습니다. APP_TEST_ENABLED=true 설정 후 merge commit으로 main에 반영해 최초 테스트 빌드·제출을 검증합니다.
+- 공개 앱 출시는 실행하지 않습니다. main 병합에 따라 웹 프로덕션 배포도 실행됩니다. 실제 CI 결과는 후속 기록합니다.
