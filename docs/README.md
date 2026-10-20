@@ -13,6 +13,7 @@ ToMyX의 명세와 작업 지식을 모으는 곳입니다. Claude Code와 Codex
 
 | 문서 | 역할 |
 | --- | --- |
+| [프론트엔드 아키텍처](specs/frontend-architecture.md) | 기능별 구조, 의존성 방향, UI·상태·데이터 분리와 기존 코드 적용 기준 |
 | [Android 로컬 개발](setup/android-local.md) | SDK·Node 경로와 NDK 준비, 로컬 빌드 오류 확인 |
 | [iOS 로컬 개발](setup/ios-local.md) | Xcode·시뮬레이터와 SDK 57 Scene 설정 |
 | [프로젝트 스킬](skills/README.md) | 공통 스킬 목록, 실행 조건과 에이전트 연결 방식 |

@@ -111,6 +111,11 @@ npx expo install --fix     # 호환되지 않는 의존성 수정
 - ESLint 의존성과 `eslint.config.js`를 구성했습니다. CI에서도 `npm run lint`와 `npm run typecheck`를 실행합니다.
 - `expo install --fix`는 의존성을 변경하므로 호환성 문제를 확인한 경우에 사용합니다.
 
+## 프론트엔드 설계
+
+- 기능 구현·수정 전에 [프론트엔드 아키텍처](docs/specs/frontend-architecture.md)를 읽고 파일 배치·의존성 방향·상태 소유 규칙을 따릅니다. 상세 설계 원본은 해당 문서에서 관리합니다.
+- 새 제품 기능부터 적용하며 기존 템플릿 코드는 관련 기능을 구현할 때 전환합니다. 예외와 미전환 범위는 해당 기능 스펙에 기록합니다.
+
 ## 화면과 라우팅
 
 - 화면 이동은 Expo Router를 사용합니다. 라우트는 `src/app/`에 두고, `_layout.tsx`에서 내비게이터를 구성합니다.

@@ -51,7 +51,6 @@ PRD·IA·Tech Spec은 문서 안의 관점이며 별도 산출물로 나누지 �
 
 | 문서 | 유형 | 다루는 범위 |
 | --- | --- | --- |
-
 | [브랜치별 빌드와 배포](build-deploy.md) | 개발 환경·배포 흐름 | GitHub Actions와 EAS 빌드·배포·제출 |
-
 | [앱 테스트 자동화](app-test-automation.md) | 배포 흐름·기술 설계 | 변경 판정과 테스트 OTA·바이너리 배포 |
+| [프론트엔드 아키텍처](frontend-architecture.md) | 공통 구조·기술 설계 | 기능별 구성과 의존성·상태·플랫폼 경계 |

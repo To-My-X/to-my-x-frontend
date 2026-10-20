@@ -76,3 +76,10 @@
 - 소스 SHA: 13179dbc198779367a8cf880411b88fccd51818d. Android 빌드 23d1ce55-34d3-4b7d-aec9-93f9b2dcb3b7 → 내부 테스트 제출 58db4cac-b651-414d-a39c-4c73858f213b 성공. iOS 빌드 a514910f-90c4-412d-a731-343132a0b65b → TestFlight 제출 498c8c2e-518d-47e8-8563-155ccf26dcbc 성공.
 - 두 플랫폼 모두 build-submit 분기로 실행됐고 app-test 태그의 success SHA·fingerprint·buildId와 pending=null을 확인했습니다.
 - 이번 새 버전의 스토어 처리 완료·테스터 설치·실행은 직접 확인하지 않았습니다. 공개 앱 출시와 production OTA는 실행하지 않았습니다. 다음 공통 코드 변경에서는 testing OTA 분기와 설치 앱 반영을 별도로 검증합니다.
+
+## 프론트엔드 설계 확정 — 2026-10-20
+
+- 사용자가 기능별 구조와 UI·데이터 분리를 채택했습니다. 설계 원본은 [프론트엔드 아키텍처](../specs/frontend-architecture.md)이며 AGENTS.md에서 구현 전 읽고 따르도록 연결했습니다.
+- 새 제품 기능부터 적용합니다. 현재 Expo 템플릿 화면과 hooks·constants 등은 유지하며, 관련 제품 기능 구현 시 전환합니다. 코드 이동·새 의존성·import 경계 자동 검사는 이번 작업에 포함하지 않습니다.
+- 사용자 확인상 Android·iOS 내부 테스트 배포를 직접 확인했습니다. OTA 자동 분기는 여전히 별도 검증 대상입니다.
+- npm run lint·npm run typecheck 통과, AGENTS.md와 docs의 로컬 문서 링크 88개 및 git diff --check 통과. 문서만 변경했으며 앱 동작·빌드 검증은 실행하지 않았습니다.
