@@ -8,7 +8,7 @@ import { useFeed } from './hooks/use-feed';
 import { initialScroll, updateScroll } from './scroll-controls';
 import type { FeedScenario } from './types';
 
-export function FeedScreen({ scenario }: { scenario: FeedScenario }) {
+export function FeedScreen({ scenario, onWrite }: { scenario: FeedScenario; onWrite?: () => void }) {
   const feed = useFeed(scenario);
   const insets = useSafeAreaInsets();
   const [height, setHeight] = useState(812);
@@ -33,7 +33,7 @@ export function FeedScreen({ scenario }: { scenario: FeedScenario }) {
     <View pointerEvents="box-none" style={[styles.header, { top: insets.top + 22 }]}><Text style={styles.brand}>To My X</Text>{!hidden && <View style={styles.bell}><IconButton icon="bell" label="알림" /></View>}</View>
     <View pointerEvents="box-none" style={[styles.footer, { bottom: insets.bottom + 20 }]}>
       <View style={styles.navigation}>{!hidden && <><IconButton icon="mute" label="소리 꺼짐" /><View style={styles.tabs}><Pressable disabled accessibilityRole="tab" accessibilityState={{ selected: true, disabled: true }} style={[styles.tab, styles.selected]}><Text style={styles.tabText}>스토리</Text></Pressable><Pressable disabled accessibilityRole="tab" accessibilityState={{ disabled: true }} style={styles.tab}><Text style={styles.tabText}>MY</Text></Pressable></View></>}</View>
-      <IconButton icon="plus" label="이야기 쓰기" bright />
+      <IconButton icon="plus" label="이야기 쓰기" bright onPress={feed.error && feed.items.length === 0 ? undefined : onWrite} />
     </View>
   </View></View>;
 }
