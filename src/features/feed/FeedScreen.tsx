@@ -6,16 +6,18 @@ import { tokens as t } from '@/theme/tokens';
 import { StoryCard } from './components/story-card';
 import { useFeed } from './hooks/use-feed';
 import { initialScroll, updateScroll } from './scroll-controls';
-import type { FeedScenario } from './types';
+import type { FeedScenario, Story } from './types';
 
-export function FeedScreen({ scenario, onWrite }: { scenario: FeedScenario; onWrite?: () => void }) {
+export function FeedScreen({ scenario, onWrite, onBell, onMyTab, onShare, onMore }: {
+  scenario: FeedScenario; onWrite?: () => void; onBell?: () => void; onMyTab?: () => void; onShare?: (story: Story) => void; onMore?: (story: Story) => void;
+}) {
   const feed = useFeed(scenario);
   const insets = useSafeAreaInsets();
   const [height, setHeight] = useState(812);
   const [hidden, setHidden] = useState(false);
   const scroll = useRef(initialScroll);
   return <View style={styles.outer}><View style={styles.screen} onLayout={event => setHeight(event.nativeEvent.layout.height)}>
-    <FlatList testID="feed-list" data={feed.items} keyExtractor={item => item.id} renderItem={({ item }) => <StoryCard story={item} height={height} />}
+    <FlatList testID="feed-list" data={feed.items} keyExtractor={item => item.id} renderItem={({ item }) => <StoryCard story={item} height={height} onShare={onShare && (() => onShare(item))} onMore={onMore && (() => onMore(item))} />}
       style={styles.list} contentContainerStyle={feed.items.length === 0 ? { flexGrow: 1 } : undefined}
       initialNumToRender={2} maxToRenderPerBatch={3} windowSize={5} showsVerticalScrollIndicator={false}
       onEndReached={feed.loadMore} onEndReachedThreshold={0.5} scrollEventThrottle={16}
@@ -30,9 +32,9 @@ export function FeedScreen({ scenario, onWrite }: { scenario: FeedScenario; onWr
       </View>}
       ListFooterComponent={feed.items.length > 0 && (feed.loading || feed.error) ? <View style={styles.pagination}>{feed.loading ? <ActivityIndicator accessibilityLabel="다음 이야기 불러오는 중" color={t.text} /> : <><Text style={styles.description}>다음 이야기를 불러오지 못했어요.</Text><ActionButton label="다음 이야기 다시 불러오기" onPress={feed.retry} /></>}</View> : null}
     />
-    <View pointerEvents="box-none" style={[styles.header, { top: insets.top + 22 }]}><Text style={styles.brand}>To My X</Text>{!hidden && <View style={styles.bell}><IconButton icon="bell" label="알림" /></View>}</View>
+    <View pointerEvents="box-none" style={[styles.header, { top: insets.top + 22 }]}><Text style={styles.brand}>To My X</Text>{!hidden && <View style={styles.bell}><IconButton icon="bell" label="알림" onPress={onBell} /></View>}</View>
     <View pointerEvents="box-none" style={[styles.footer, { bottom: insets.bottom + 20 }]}>
-      <View style={styles.navigation}>{!hidden && <><IconButton icon="mute" label="소리 꺼짐" /><View style={styles.tabs}><Pressable disabled accessibilityRole="tab" accessibilityState={{ selected: true, disabled: true }} style={[styles.tab, styles.selected]}><Text style={styles.tabText}>스토리</Text></Pressable><Pressable disabled accessibilityRole="tab" accessibilityState={{ disabled: true }} style={styles.tab}><Text style={styles.tabText}>MY</Text></Pressable></View></>}</View>
+      <View style={styles.navigation}>{!hidden && <><IconButton icon="mute" label="소리 꺼짐" /><View style={styles.tabs}><Pressable disabled accessibilityRole="tab" accessibilityState={{ selected: true, disabled: true }} style={[styles.tab, styles.selected]}><Text style={styles.tabText}>스토리</Text></Pressable><Pressable disabled={!onMyTab} onPress={onMyTab} accessibilityRole="tab" accessibilityState={{ disabled: !onMyTab }} style={styles.tab}><Text style={styles.tabText}>MY</Text></Pressable></View></>}</View>
       <IconButton icon="plus" label="이야기 쓰기" bright onPress={feed.error && feed.items.length === 0 ? undefined : onWrite} />
     </View>
   </View></View>;

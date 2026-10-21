@@ -5,7 +5,7 @@ import { Icon, IconButton } from '@/components/ui/feed-actions';
 import { tokens as t } from '@/theme/tokens';
 import type { Story } from '../types';
 const backgrounds = { window: require('@/assets/images/feed/window-night.jpg'), cafe: require('@/assets/images/feed/cafe-night.jpg') };
-export function StoryCard({ story, height }: { story: Story; height: number }) {
+export function StoryCard({ story, height, onShare, onMore }: { story: Story; height: number; onShare?: () => void; onMore?: () => void }) {
   return <View testID={story.id} style={[styles.card, { minHeight: height }]}>
     <Image source={backgrounds[story.background]} contentFit="cover" style={StyleSheet.absoluteFill} accessible={false} />
     <LinearGradient colors={['rgba(21,19,15,0.18)', 'rgba(21,19,15,0.15)', 'rgba(21,19,15,0.85)', t.background]} locations={[0, 0.35, 0.68, 1]} style={StyleSheet.absoluteFill} />
@@ -15,7 +15,7 @@ export function StoryCard({ story, height }: { story: Story; height: number }) {
       <Text accessibilityRole="header" style={styles.title}>{story.title}</Text>
       <View style={styles.row}>
         <Text style={styles.body}>{story.body}</Text>
-        <View style={styles.actions}><IconButton icon="heart" label="공감" caption="공감" /><IconButton icon="share" label="공유" caption="공유" /><IconButton icon="more" label="더보기" caption="더보기" /></View>
+        <View style={styles.actions}><IconButton icon="heart" label="공감" caption="공감" /><IconButton icon="share" label="공유" caption="공유" onPress={onShare} /><IconButton icon="more" label="더보기" caption="더보기" onPress={onMore} /></View>
       </View>
       <Text style={styles.signature}>익명의 X가 남긴 이야기</Text>
     </View>
