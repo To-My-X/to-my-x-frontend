@@ -4,8 +4,8 @@
 
 - 유형: 공통 컴포넌트·시각 기준
 - 명세 상태: 초안. 전달 UI의 구성과 공통 동작은 반영했으며, 정확한 토큰 값·자산·일부 상태 표현은 추가 확인이 필요합니다.
-- 구현 상태: 미착수
-- 검증 상태: 일부 확인. PDF와 렌더 이미지를 검토했으며 제품 화면 비교는 미실행입니다.
+- 구현 상태: 04.01~04.04에 필요한 토큰·폰트·아이콘/버튼 구현. 나머지 공통 UI 미착수
+- 검증 상태: 일부 확인. PDF와 렌더 이미지를 검토했으며 mock 피드의 Chromium 화면을 확인했습니다. 최종 디자인 일치·네이티브 검수는 남아 있습니다.
 - 갱신일: 2026-10-21
 - 입력 자료: [자료 목록](../references/tomyx-2026-10-20/README.md)의 `2-00`, `2-02`~`2-09`, 공통 정책 `0-01` VISUAL·NAV·SCROLL, `0-06` ASSET.
 - 관련 정책: [서비스 규칙](../policy/service-rules.md), [출시 운영 기준](../policy/launch-operations.md)
@@ -120,3 +120,17 @@
 | 날짜 | 내용 | 근거 |
 | --- | --- | --- |
 | 2026-10-21 | 디자인 보드에서 공통 컴포넌트 책임과 필요한 상태를 정리. 확인되지 않은 수치는 미정으로 보존. | Desktop ToMyX 자료 정리 요청과 전달 PDF |
+
+## 7. 04.01~04.04 mock 구현 기준 — 2026-10-21
+
+이번 검수용 임시 토큰 원본은 `src/theme/tokens.ts`입니다. 배경 `#15130f`, 표면 `#302d27`, 본문 `#f5efe3`, 보조 글자 `#b8b0a2`, 기본 여백 24, 웹 최대 폭 480을 사용합니다. 제목 26/37, 본문 16/28, UI 11~14 크기와 행간은 확정 디자인 토큰이 아닌 구현 제안입니다. 스크롤은 연속 방식이며 긴 글은 카드 높이가 늘어나 본문이 잘리지 않습니다.
+
+공통 구현은 `Icon`, `IconButton`, `ActionButton`입니다. 상태 화면·하단 탭·StoryCard는 피드 전용입니다. 기존 Expo 템플릿의 `constants/theme.ts`와 explore 화면은 유지하며 제품 토큰을 참조하지 않습니다. 템플릿 전환 시 정리합니다. 브랜드는 텍스트로 표시하고 아이콘은 SVG 선으로 작성했습니다. 최종 로고·아이콘 원본과의 일치 검수는 남아 있습니다.
+
+| 자산 | 경로·출처 | 사용 기준 |
+| --- | --- | --- |
+| MaruBuri Regular | `assets/fonts/MaruBuri-Regular.ttf`, [NAVER 공식 배포](https://hangeul.naver.com/hangeul_static/webfont/zips/maruburi.zip) | 제목·본문. [공식 사용 조건](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko), SIL OFL 1.1 고지 동봉 |
+| Pretendard Regular | `assets/fonts/Pretendard-Regular.otf`, [공식 v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9) | 메타데이터·버튼. SIL OFL 1.1 원본 고지 동봉 |
+| window-night / cafe-night | `assets/images/feed/`, 자료 `2-04` PDF의 원본 임베디드 JPEG 추출 | mock 검수 전용. 공개 배포 전 권리·최종 원본 확인 필요 |
+
+폰트는 expo-font로 로드하고 실패 시 시스템 fallback으로 화면 진입을 허용합니다. 배경 명암은 expo-linear-gradient, 아이콘은 react-native-svg를 SDK 57 호환 버전으로 추가했습니다. 네이티브 개발용 앱은 추가된 모듈 반영을 위해 재빌드가 필요할 수 있습니다. 확인한 공식 문서는 [Font](https://docs.expo.dev/versions/v57.0.0/sdk/font/), [LinearGradient](https://docs.expo.dev/versions/v57.0.0/sdk/linear-gradient/), [SVG](https://docs.expo.dev/versions/v57.0.0/sdk/svg/)입니다.
