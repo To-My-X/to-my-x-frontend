@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, SlideInDown } from 'react-native-reanimated';
 import { ActionButton } from '@/components/ui/feed-actions';
 import { flowStyles as f } from '@/components/ui/flow-page';
 import { tokens as t } from '@/theme/tokens';
@@ -10,7 +10,7 @@ export function LoginScreen({ onCancel, onMockLogin }: { onCancel: () => void; o
     <Animated.View entering={FadeIn.duration(180)} style={[StyleSheet.absoluteFill, styles.backdrop]}>
       <Pressable accessibilityRole="button" accessibilityLabel="로그인 닫기" style={StyleSheet.absoluteFill} onPress={onCancel} />
     </Animated.View>
-    <Animated.View entering={SlideInDown.springify().damping(26).stiffness(260)} style={styles.sheet} accessibilityViewIsModal>
+    <Animated.View entering={SlideInDown.duration(280).easing(Easing.out(Easing.cubic))} style={styles.sheet} accessibilityViewIsModal>
       <Text accessibilityRole="header" style={f.title}>이 마음을 남기려면</Text>
       <Text style={f.muted}>로그인하고 당신의 이야기를 남겨보세요.</Text>
       {['Apple', 'Google', '카카오'].map(provider => <ActionButton key={provider} label={`${provider}로 계속하기`} disabled />)}
