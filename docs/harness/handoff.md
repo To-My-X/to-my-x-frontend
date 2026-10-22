@@ -9,6 +9,11 @@
 - 시작 문서: [제품 명세 총괄과 화면 지도](../specs/product-overview.md)의 7장 화면 연결 골격
 - 입력 자료: [PDF 76개 목록·원문 추출·디자인 미리보기](../references/tomyx-2026-10-20/README.md). 현재 화면 59개와 LEGACY 1개를 구분했습니다.
 
+## 피드 페이징·모션 — 2026-10-22
+
+- 사용자 결정으로 피드를 페이지 스냅(한 스와이프 = 한 이야기)으로 변경하고, FlowPage 진입 페이드·시트 슬라이드(reanimated)·네이티브 스택 slide_from_right 전환을 추가했습니다. 근거와 세부는 [디자인 시스템](../specs/design-system.md) 7장과 [피드 스펙](../specs/story-feed.md)의 2026-10-22 기록을 따릅니다.
+- 검증: lint·타입·단위 테스트 8개 통과. Chromium 375×812에서 스냅 위치·원위치 복귀·긴 글 내부 스크롤·시트 표시를 확인, 콘솔 오류 0건. 네이티브 전환·실기기 스와이프·reduce motion 대응은 미검증입니다.
+
 ## 화면 연결 골격 — 2026-10-22
 
 - 전 화면을 mock으로 연결했습니다. 상세 범위와 미구현 항목은 각 스펙의 "화면 연결" 기록을 따릅니다: [총괄 7장](../specs/product-overview.md), [글쓰기](../specs/story-writing.md), [계정](../specs/account-access.md), [피드·관리](../specs/story-feed.md), [온보딩](../specs/onboarding-simulation.md).

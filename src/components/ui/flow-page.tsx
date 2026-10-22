@@ -1,5 +1,6 @@
 import type { PropsWithChildren, ReactNode } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ActionButton } from './feed-actions';
 import { tokens as t } from '@/theme/tokens';
@@ -14,7 +15,9 @@ export function FlowPage({ title, onBack, right, footer, children }: PropsWithCh
           <Text accessibilityRole="header" style={styles.heading}>{title}</Text>
           {right && <View style={styles.right}>{right}</View>}
         </View>
-        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>{children}</ScrollView>
+        <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={styles.body}>
+          <Animated.View entering={FadeInDown.duration(260)} style={styles.animated}>{children}</Animated.View>
+        </ScrollView>
         {footer}
       </View>
     </KeyboardAvoidingView>
@@ -32,5 +35,6 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 24, padding: 20 },
   right: { marginLeft: 'auto' },
   heading: { fontFamily: t.serif, fontSize: 20, color: t.text },
-  body: { flexGrow: 1, padding: 24, gap: 24, paddingBottom: 48 },
+  body: { flexGrow: 1, padding: 24, paddingBottom: 48 },
+  animated: { flex: 1, gap: 24 },
 });
