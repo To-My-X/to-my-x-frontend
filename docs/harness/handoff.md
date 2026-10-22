@@ -9,6 +9,14 @@
 - 시작 문서: [제품 명세 총괄과 화면 지도](../specs/product-overview.md)의 7장 화면 연결 골격
 - 입력 자료: [PDF 76개 목록·원문 추출·디자인 미리보기](../references/tomyx-2026-10-20/README.md). 현재 화면 59개와 LEGACY 1개를 구분했습니다.
 
+## 내부 테스트 mock 로그인·시트 수정 — 2026-10-22
+
+- 내부 테스트 빌드에 mock 로그인이 없다는 사용자 보고에 따라 활성 조건을 `__DEV__ || EXPO_PUBLIC_MOCK_AUTH=1`로 확장했습니다. 플래그는 EAS preview 환경에 등록(`eas env`)해 testing 빌드·OTA에만 주입되고 production 환경에는 없습니다.
+- 네이티브에서 바텀시트가 웹과 다르게 보이는 문제는 RN Modal 안에서 reanimated 진입 애니메이션이 실행되지 않는 제약이 원인이라 BottomSheet를 Modal 대신 화면 위 오버레이로 변경했습니다. 하드웨어 뒤로 가기 닫기는 미연결입니다.
+- iOS 시뮬레이터 검증 중 Hermes에 없는 `Intl.Segmenter` 사용으로 네이티브가 시작 시 크래시하는 문제를 발견해 코드 포인트 폴백으로 수정했습니다(실수 기록 참조). 10-21 바이너리에 d7fdafb OTA가 적용되면 크래시했을 상태였습니다.
+- 검증: 시뮬레이터(iPhone 18 Pro)에서 피드 스와이프 스냅·스크롤 후 컨트롤 숨김·공유/로그인 시트·mock 로그인→동의→편집 카운터 렌더 확인. lint·타입·단위 테스트 통과.
+- 폰 반영은 다음 main 머지의 testing OTA로 전달됩니다. 단, 폰에는 10-21 제출 바이너리(iOS b47e7383, Android versionCode 6)가 설치돼 있어야 OTA를 받습니다. 이전 10-19 빌드는 runtime이 달라 OTA 대상이 아닙니다.
+
 ## 피드 페이징·모션 — 2026-10-22
 
 - 사용자 결정으로 피드를 페이지 스냅(한 스와이프 = 한 이야기)으로 변경하고, FlowPage 진입 페이드·시트 슬라이드(reanimated)·네이티브 스택 slide_from_right 전환을 추가했습니다. 근거와 세부는 [디자인 시스템](../specs/design-system.md) 7장과 [피드 스펙](../specs/story-feed.md)의 2026-10-22 기록을 따릅니다.

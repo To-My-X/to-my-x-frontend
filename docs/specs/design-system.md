@@ -127,7 +127,7 @@
 
 스크롤은 2026-10-22 사용자 결정으로 연속 방식에서 페이지 스냅(한 번에 한 이야기, `pagingEnabled`)으로 변경했습니다. 카드 높이는 화면 높이로 고정하고 긴 본문은 카드 안에서 스크롤합니다. 웹은 `pagingEnabled`가 컨테이너 snap-type만 설정하므로 카드에 `scrollSnapAlign: start`를 함께 지정합니다.
 
-화면·시트 모션: 전체 화면은 `FlowPage`의 reanimated FadeInDown 진입과 네이티브 스택 `slide_from_right` 전환, 시트는 `BottomSheet`·로그인 시트의 배경 FadeIn + SlideInDown 스프링을 사용합니다. 모션 시간·easing의 확정 값과 동작 줄이기(reduce motion) 대응은 디자인 토큰과 함께 추후 확정합니다.
+화면·시트 모션: 전체 화면은 `FlowPage`의 reanimated FadeInDown 진입과 네이티브 스택 `slide_from_right` 전환, 시트는 `BottomSheet`·로그인 시트의 배경 FadeIn + SlideInDown 스프링을 사용합니다. RN `Modal` 안에서는 reanimated 진입 애니메이션이 네이티브에서 실행되지 않아 `BottomSheet`는 Modal 대신 화면 위 오버레이로 그리며, 하드웨어 뒤로 가기 닫기는 아직 연결하지 않았습니다. 모션 시간·easing의 확정 값과 동작 줄이기(reduce motion) 대응은 디자인 토큰과 함께 추후 확정합니다.
 
 공통 구현은 `Icon`, `IconButton`, `ActionButton`과 2026-10-22 추가한 `FlowPage`(헤더·스크롤·푸터 골격), `BottomSheet`(배경 잠금 시트)입니다. 상태 화면·하단 탭·StoryCard는 피드 전용입니다. 기존 Expo 템플릿의 `constants/theme.ts`와 explore 화면은 유지하며 제품 토큰을 참조하지 않습니다. 템플릿 전환 시 정리합니다. 브랜드는 텍스트로 표시하고 아이콘은 SVG 선으로 작성했습니다. 최종 로고·아이콘 원본과의 일치 검수는 남아 있습니다.
 
