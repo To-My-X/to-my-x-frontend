@@ -19,7 +19,7 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 export function SettingsScreen({ onBack, onLegal, onLogout, onDeleteAccount }: { onBack: () => void; onLegal: (kind: 'terms' | 'privacy') => void; onLogout: () => void; onDeleteAccount: () => void }) {
   const [confirming, setConfirming] = useState(false);
-  return <FlowPage title="설정" onBack={onBack}>
+  return <><FlowPage title="설정" onBack={onBack}>
     <Section title="계정"><Row label="Mock 계정" value="연결 확인용" /></Section>
     <Section title="알림"><Row label="푸시 알림" value="준비 중" /></Section>
     <Section title="안내">
@@ -32,12 +32,12 @@ export function SettingsScreen({ onBack, onLegal, onLogout, onDeleteAccount }: {
       <Row label="로그아웃" onPress={() => setConfirming(true)} />
       <Row label="탈퇴하기" onPress={onDeleteAccount} />
     </Section>
-    <BottomSheet visible={confirming} onClose={() => setConfirming(false)}>
-      <Text accessibilityRole="header" style={f.title}>로그아웃할까요?</Text>
-      <Text style={f.muted}>다시 로그인하면 내 이야기를 그대로 볼 수 있어요.</Text>
-      <ActionButton label="로그아웃" onPress={onLogout} />
-      <ActionButton label="취소" onPress={() => setConfirming(false)} />
-    </BottomSheet>
-  </FlowPage>;
+  </FlowPage>
+  <BottomSheet visible={confirming} onClose={() => setConfirming(false)}>
+    <Text accessibilityRole="header" style={f.title}>로그아웃할까요?</Text>
+    <Text style={f.muted}>다시 로그인하면 내 이야기를 그대로 볼 수 있어요.</Text>
+    <ActionButton label="로그아웃" onPress={onLogout} />
+    <ActionButton label="취소" onPress={() => setConfirming(false)} />
+  </BottomSheet></>;
 }
 const styles = StyleSheet.create({ row: { minHeight: 52, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderBottomWidth: 1, borderBottomColor: t.line } });
