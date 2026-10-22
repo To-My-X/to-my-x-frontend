@@ -16,5 +16,5 @@ export default function RootLayout() {
   });
   useEffect(() => { if (loaded || error) void SplashScreen.hideAsync(); }, [loaded, error]);
   if (!loaded && !error) return null;
-  return <MockSessionProvider><WritingSessionProvider><StatusBar style="light" /><Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: tokens.background } }}><Stack.Screen name="login" options={{ presentation: 'transparentModal', contentStyle: { backgroundColor: 'transparent' } }} /></Stack></WritingSessionProvider></MockSessionProvider>;
+  return <MockSessionProvider><WritingSessionProvider><StatusBar style="light" /><Stack screenOptions={{ headerShown: false, animation: 'slide_from_right', contentStyle: { backgroundColor: tokens.background } }}><Stack.Screen name="login" options={{ presentation: 'transparentModal', animation: 'fade', contentStyle: { backgroundColor: 'transparent' } }} /></Stack></WritingSessionProvider></MockSessionProvider>;
 }

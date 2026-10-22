@@ -1,12 +1,15 @@
 import type { PropsWithChildren } from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
 import { tokens as t } from '@/theme/tokens';
 
 export function BottomSheet({ visible, onClose, children }: PropsWithChildren<{ visible: boolean; onClose: () => void }>) {
-  return <Modal transparent visible={visible} animationType="fade" onRequestClose={onClose}>
+  return <Modal transparent visible={visible} onRequestClose={onClose}>
     <View style={styles.overlay}>
-      <Pressable accessibilityRole="button" accessibilityLabel="닫기" style={StyleSheet.absoluteFill} onPress={onClose} />
-      <View style={styles.sheet} accessibilityViewIsModal>{children}</View>
+      <Animated.View entering={FadeIn.duration(180)} style={StyleSheet.absoluteFill}>
+        <Pressable accessibilityRole="button" accessibilityLabel="닫기" style={StyleSheet.absoluteFill} onPress={onClose} />
+      </Animated.View>
+      <Animated.View entering={SlideInDown.springify().damping(26).stiffness(260)} style={styles.sheet} accessibilityViewIsModal>{children}</Animated.View>
     </View>
   </Modal>;
 }
