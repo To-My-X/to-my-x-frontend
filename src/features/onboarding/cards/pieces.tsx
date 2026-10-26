@@ -1,67 +1,95 @@
-import { LinearGradient } from "expo-linear-gradient";
+import { Image } from "expo-image";
 import type { PropsWithChildren } from "react";
-import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
+import {
+  StyleSheet,
+  View,
+  type ImageSourcePropType,
+  type StyleProp,
+  type ViewStyle,
+} from "react-native";
 import { tokens as t } from "@/theme/tokens";
 
-// 카톡·인스타·자니 상황을 재현한 연출용 조각입니다. 실제 외부 앱 UI가 아니며 어떤 동작도 하지 않습니다.
-export function SceneCard({ children, style }: PropsWithChildren<{ style?: StyleProp<ViewStyle> }>) {
+// 디자인 PDF(2-02)에 임베디드된 원본 사진입니다. 이 이미지가 최종 사용자에게 그대로 보입니다.
+export const photos = {
+  couple: require("@/assets/images/onboarding/couple-sunset.jpg"),
+  portrait: require("@/assets/images/onboarding/x-portrait.jpg"),
+  bedroom: require("@/assets/images/onboarding/bedroom-night.jpg"),
+  cafe: require("@/assets/images/feed/cafe-night.jpg"),
+} as const;
+
+// 카톡·인스타·자니 화면을 재현한 연출 패널입니다. 실제 외부 앱이 아니며 어떤 동작도 하지 않습니다.
+export function AppPanel({
+  children,
+  style,
+}: PropsWithChildren<{ style?: StyleProp<ViewStyle> }>) {
   return (
     <View
       accessible={false}
       importantForAccessibility="no-hide-descendants"
       pointerEvents="none"
-      style={[styles.card, style]}
+      style={[styles.panel, style]}
     >
       {children}
     </View>
   );
 }
 
-export function Avatar({ label, size = 40, warm = false }: { label: string; size?: number; warm?: boolean }) {
-  const base = { width: size, height: size, borderRadius: size * 0.38 };
-  if (warm)
-    return (
-      <LinearGradient colors={["#6b5a43", "#3a3127"]} style={[base, styles.avatarCenter]}>
-        <Text style={[styles.avatarText, { fontSize: size * 0.4 }]}>{label}</Text>
-      </LinearGradient>
-    );
+export function Avatar({
+  source,
+  size = 44,
+  round = false,
+}: {
+  source: ImageSourcePropType;
+  size?: number;
+  round?: boolean;
+}) {
   return (
-    <View style={[base, styles.avatar, styles.avatarCenter]}>
-      <Text style={[styles.avatarText, { fontSize: size * 0.4 }]}>{label}</Text>
-    </View>
+    <Image
+      source={source}
+      contentFit="cover"
+      accessible={false}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: round ? size / 2 : size * 0.4,
+      }}
+    />
   );
 }
 
-// 사진이 들어갈 자리의 따뜻한 그라데이션. 실제 자산 확보 전까지의 연출입니다.
-export function Photo({ style }: { style?: StyleProp<ViewStyle> }) {
+// 비어 있는 친구 아바타(이웃 목록용). 사진 없이 어두운 면으로만 둡니다.
+export function BlankAvatar({ size = 44 }: { size?: number }) {
   return (
-    <LinearGradient
-      colors={["#5d4e3a", "#2e2820", "#1b1713"]}
-      start={{ x: 0.1, y: 0 }}
-      end={{ x: 0.9, y: 1 }}
-      style={[styles.photo, style]}
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size * 0.4,
+        backgroundColor: "#2e2a23",
+      }}
     />
   );
 }
 
 export const pieceStyles = StyleSheet.create({
-  row: { flexDirection: "row", alignItems: "center", gap: 12, paddingVertical: 10 },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    paddingVertical: 10,
+  },
   name: { color: t.text, fontFamily: t.sans, fontSize: 14 },
   caption: { color: t.muted, fontFamily: t.sans, fontSize: 12 },
-  divider: { height: 1, backgroundColor: t.line },
+  icon: { color: t.muted, fontFamily: t.sans, fontSize: 16 },
 });
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: 20,
-    backgroundColor: "#1d1a15",
+  panel: {
+    borderRadius: 18,
+    backgroundColor: "#16130e",
     borderWidth: 1,
-    borderColor: t.line,
-    padding: 18,
+    borderColor: "rgba(245,239,227,0.1)",
+    padding: 16,
     overflow: "hidden",
   },
-  avatar: { backgroundColor: "#3a362e" },
-  avatarCenter: { alignItems: "center", justifyContent: "center" },
-  avatarText: { color: t.text, fontFamily: t.sans },
-  photo: { borderRadius: 14 },
 });

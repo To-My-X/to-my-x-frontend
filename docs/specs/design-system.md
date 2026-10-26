@@ -136,5 +136,6 @@
 | MaruBuri Regular | `assets/fonts/MaruBuri-Regular.ttf`, [NAVER 공식 배포](https://hangeul.naver.com/hangeul_static/webfont/zips/maruburi.zip) | 제목·본문. [공식 사용 조건](https://help.naver.com/service/30016/contents/18088?osType=PC&lang=ko), SIL OFL 1.1 고지 동봉 |
 | Pretendard Regular | `assets/fonts/Pretendard-Regular.otf`, [공식 v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9) | 메타데이터·버튼. SIL OFL 1.1 원본 고지 동봉 |
 | window-night / cafe-night | `assets/images/feed/`, 자료 `2-04` PDF의 원본 임베디드 JPEG 추출 | mock 검수 전용. 공개 배포 전 권리·최종 원본 확인 필요 |
+| couple-sunset / x-portrait / bedroom-night | `assets/images/onboarding/`, 자료 `2-02` PDF의 원본 임베디드 JPEG 추출 | 온보딩 연출에 그대로 사용(사용자 채택). 공개 배포 전 권리·최종 원본 확인 필요 |
 
 폰트는 expo-font로 로드하고 실패 시 시스템 fallback으로 화면 진입을 허용합니다. 배경 명암은 expo-linear-gradient, 아이콘은 react-native-svg를 SDK 57 호환 버전으로 추가했습니다. 네이티브 개발용 앱은 추가된 모듈 반영을 위해 재빌드가 필요할 수 있습니다. 확인한 공식 문서는 [Font](https://docs.expo.dev/versions/v57.0.0/sdk/font/), [LinearGradient](https://docs.expo.dev/versions/v57.0.0/sdk/linear-gradient/), [SVG](https://docs.expo.dev/versions/v57.0.0/sdk/svg/)입니다.
