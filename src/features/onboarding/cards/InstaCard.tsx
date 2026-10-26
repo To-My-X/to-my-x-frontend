@@ -1,46 +1,65 @@
+import { Image } from "expo-image";
 import { StyleSheet, Text, View } from "react-native";
 import { FadeIn } from "../fade-in";
 import type { SceneId } from "../episodes";
-import { Avatar, Photo, SceneCard, pieceStyles as p } from "./pieces";
+import { AppPanel, Avatar, photos, pieceStyles as p } from "./pieces";
 import { useTyping } from "../use-typing";
 
-// 02.06~02.10 인스타 에피소드 연출.
-function Search({ dimmed }: { dimmed?: boolean }) {
-  const { typed, done } = useTyping(dimmed ? "" : "x.archive");
+function TabBar() {
   return (
-    <SceneCard style={dimmed && { opacity: 0.5 }}>
-      <View style={styles.searchBar}>
-        <Text style={p.caption}>⌕</Text>
-        <Text style={p.name}>
-          {dimmed ? "x.archive" : typed}
-          {!dimmed && !done && <Text style={p.caption}>|</Text>}
-        </Text>
-      </View>
-      <FadeIn delay={dimmed ? 200 : 2200} duration={900}>
-        <View style={p.row}>
-          <Avatar label="x" warm />
-          <View>
-            <Text style={p.name}>x.archive</Text>
-            <Text style={p.caption}>X · 작은 기록들</Text>
-          </View>
-        </View>
-      </FadeIn>
-    </SceneCard>
+    <View style={styles.tabBar}>
+      <Text style={p.icon}>⌂</Text>
+      <Text style={p.icon}>⌕</Text>
+      <Text style={p.icon}>▦</Text>
+      <Text style={p.icon}>♡</Text>
+      <Avatar source={photos.portrait} size={20} round />
+    </View>
   );
 }
 
-// 02.07 계정 프로필. 그리드에 최근 게시물 한 장이 새로 떠오릅니다.
+// 02.06 검색창. x.archive가 입력되면 계정이 떠오릅니다.
+function Search() {
+  const { typed, done } = useTyping("x.archive");
+  return (
+    <AppPanel>
+      <View style={styles.searchBar}>
+        <Text style={p.icon}>⌕</Text>
+        <Text style={p.name}>
+          {typed}
+          {!done && <Text style={p.caption}>|</Text>}
+        </Text>
+      </View>
+      <FadeIn delay={2200} duration={900}>
+        <View style={p.row}>
+          <Avatar source={photos.portrait} size={44} round />
+          <View style={{ flex: 1 }}>
+            <Text style={p.name}>x.archive</Text>
+            <Text style={p.caption}>X</Text>
+          </View>
+          <Text style={p.icon}>×</Text>
+        </View>
+      </FadeIn>
+      <TabBar />
+    </AppPanel>
+  );
+}
+
+// 02.07 계정 프로필. 최근 게시물 한 장이 새로 떠오릅니다.
 function Account() {
   return (
-    <SceneCard>
+    <AppPanel>
+      <View style={styles.accountHeader}>
+        <Text style={p.name}>x.archive</Text>
+        <Text style={p.icon}>⋯</Text>
+      </View>
       <View style={p.row}>
-        <Avatar label="x" warm size={48} />
+        <Avatar source={photos.portrait} size={52} round />
         <View style={styles.stats}>
           {(
             [
               ["24", "게시물"],
               ["218", "팔로워"],
-              ["96", "팔로잉"],
+              ["196", "팔로잉"],
             ] as const
           ).map(([value, label]) => (
             <View key={label} style={styles.stat}>
@@ -51,52 +70,73 @@ function Account() {
         </View>
       </View>
       <Text style={[p.caption, styles.bio]}>X · 작은 기록들</Text>
+      <View style={styles.accountButtons}>
+        <View style={styles.accountButton}>
+          <Text style={p.caption}>팔로잉</Text>
+        </View>
+        <View style={styles.accountButton}>
+          <Text style={p.caption}>메시지</Text>
+        </View>
+      </View>
+      <Text style={[p.caption, styles.gridLabel]}>최근 게시물 · 사진 2장</Text>
       <View style={styles.grid}>
         <FadeIn delay={900} duration={1100} rise={0}>
-          <Photo style={styles.cell} />
+          <Image
+            source={photos.cafe}
+            contentFit="cover"
+            accessible={false}
+            style={styles.cell}
+          />
         </FadeIn>
-        {Array.from({ length: 5 }, (_, index) => (
-          <View key={index} style={[styles.cell, styles.oldCell]} />
-        ))}
+        <Image
+          source={photos.portrait}
+          contentFit="cover"
+          accessible={false}
+          style={styles.cell}
+        />
       </View>
-    </SceneCard>
+      <TabBar />
+    </AppPanel>
   );
 }
 
-// 02.08 게시물 보기. 사진 두 번째 장(잔이 두 개)을 보는 장면입니다.
+// 02.08 게시물 보기. 두 번째 장의 잔이 두 개인 사진입니다.
 function Post() {
   return (
-    <SceneCard>
+    <AppPanel>
+      <View style={styles.accountHeader}>
+        <Text style={p.caption}>‹ 게시물</Text>
+        <Text style={p.icon}>⋯</Text>
+      </View>
       <View style={p.row}>
-        <Avatar label="x" warm size={32} />
+        <Avatar source={photos.portrait} size={30} round />
         <Text style={p.name}>x.archive</Text>
-        <Text style={[p.caption, styles.time]}>1시간 전</Text>
       </View>
       <FadeIn duration={1100} rise={0}>
-        <Photo style={styles.postPhoto} />
+        <Image
+          source={photos.cafe}
+          contentFit="cover"
+          accessible={false}
+          style={styles.postPhoto}
+        />
       </FadeIn>
-      <Text style={[p.caption, styles.pager]}>2/2</Text>
-    </SceneCard>
+      <View style={styles.postActions}>
+        <Text style={p.icon}>♡ ◯ ➤</Text>
+        <Text style={p.caption}>2/2</Text>
+        <Text style={p.icon}>⎙</Text>
+      </View>
+      <Text style={p.name}>x.archive 고마워</Text>
+      <Text style={p.caption}>1일 전</Text>
+    </AppPanel>
   );
 }
 
-// 02.10 화면을 덮은 뒤
-function Closed() {
-  return (
-    <SceneCard style={styles.closed}>
-      <FadeIn delay={400} duration={1400} rise={0}>
-        <View style={styles.glow} />
-      </FadeIn>
-    </SceneCard>
-  );
-}
-
+// 02.09 검색 복귀와 02.10 여운은 시안대로 패널 없이 배경과 서사만 보여줍니다.
 export function InstaCard({ scene }: { scene: SceneId }) {
   if (scene === "enter") return <Search />;
   if (scene === "choice") return <Account />;
   if (scene === "actionA") return <Post />;
-  if (scene === "actionB") return <Search dimmed />;
-  return <Closed />;
+  return null;
 }
 
 const styles = StyleSheet.create({
@@ -107,18 +147,44 @@ const styles = StyleSheet.create({
     minHeight: 42,
     borderRadius: 12,
     paddingHorizontal: 14,
-    backgroundColor: "#2a261f",
-    marginBottom: 10,
+    backgroundColor: "#262219",
+    marginBottom: 8,
+  },
+  accountHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
   },
   stats: { flex: 1, flexDirection: "row", justifyContent: "space-around" },
   stat: { alignItems: "center", gap: 2 },
-  bio: { marginBottom: 12 },
-  grid: { flexDirection: "row", flexWrap: "wrap", gap: 4 },
-  cell: { width: "32%", aspectRatio: 1, borderRadius: 6 },
-  oldCell: { backgroundColor: "#2a261f" },
-  time: { marginLeft: "auto" },
-  postPhoto: { height: 170, marginTop: 6 },
-  pager: { textAlign: "center", marginTop: 10 },
-  closed: { height: 200, backgroundColor: "#0e0c09", justifyContent: "center" },
-  glow: { height: 1, marginHorizontal: 30, backgroundColor: "rgba(245,239,227,0.14)" },
+  bio: { marginBottom: 10 },
+  accountButtons: { flexDirection: "row", gap: 8, marginBottom: 12 },
+  accountButton: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 7,
+    borderRadius: 8,
+    backgroundColor: "#262219",
+  },
+  gridLabel: { marginBottom: 6 },
+  grid: { flexDirection: "row", gap: 3 },
+  cell: { width: 96, aspectRatio: 1, borderRadius: 4 },
+  postPhoto: { width: "100%", aspectRatio: 4 / 3, borderRadius: 8, marginTop: 6 },
+  postActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  tabBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 14,
+    paddingTop: 12,
+    paddingHorizontal: 10,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(245,239,227,0.1)",
+  },
 });

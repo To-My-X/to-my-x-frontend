@@ -2,17 +2,20 @@ import { StyleSheet, Text, View } from "react-native";
 import { tokens as t } from "@/theme/tokens";
 import { FadeIn } from "../fade-in";
 import type { SceneId } from "../episodes";
-import { Avatar, SceneCard, pieceStyles as p } from "./pieces";
+import { AppPanel, Avatar, photos, pieceStyles as p } from "./pieces";
 import { useTyping } from "../use-typing";
 
-// 02.11~02.15 자니 에피소드 연출. 새벽의 채팅 앱 장면입니다.
+// 02.11 채팅 목록. 검색에 X를 입력하면 그 사람의 방이 떠오릅니다.
 function ChatList() {
-  const { typed, done } = useTyping("X", 700, 200);
+  const { typed, done } = useTyping("X", 700, 220);
   return (
-    <SceneCard>
-      <Text style={styles.header}>채팅</Text>
+    <AppPanel>
+      <View style={styles.listHeader}>
+        <Text style={styles.listTitle}>채팅</Text>
+        <Text style={p.icon}>⌕ ＋</Text>
+      </View>
       <View style={styles.searchBar}>
-        <Text style={p.caption}>⌕</Text>
+        <Text style={p.icon}>⌕</Text>
         <Text style={p.name}>
           {typed}
           {!done && <Text style={p.caption}>|</Text>}
@@ -20,105 +23,146 @@ function ChatList() {
       </View>
       <FadeIn delay={1400} duration={1000}>
         <View style={p.row}>
-          <Avatar label="X" warm size={44} />
-          <View style={styles.preview}>
+          <Avatar source={photos.portrait} size={46} />
+          <View style={{ flex: 1 }}>
             <Text style={p.name}>X</Text>
-            <Text style={p.caption}>잘 지내.</Text>
+            <Text style={p.caption}>너도 잘 지내.</Text>
           </View>
-          <Text style={p.caption}>오전 2:41</Text>
+          <Text style={p.caption}>오전 2:47</Text>
         </View>
       </FadeIn>
-    </SceneCard>
+    </AppPanel>
   );
 }
 
-// 02.12 멈춰 있는 대화 · 02.13 보내기 직전("자니"를 썼다 지우는 자리)
+// 02.12 멈춰 있는 대화 · 02.13 보내기 직전("자니"와 연출용 키보드)
 function ChatRoom({ draft }: { draft?: boolean }) {
-  const { typed, done } = useTyping(draft ? "자니" : "", 900, 260);
+  const { typed, done } = useTyping(draft ? "자니" : "", 900, 280);
   return (
-    <SceneCard>
-      <View style={[p.row, styles.roomHeader]}>
-        <Text style={p.caption}>‹</Text>
+    <AppPanel>
+      <View style={styles.roomHeader}>
+        <Text style={p.icon}>‹</Text>
         <Text style={p.name}>X</Text>
+        <Text style={p.icon}>⌕ ≡</Text>
       </View>
       <FadeIn duration={900}>
-        <View style={[styles.bubble, styles.left]}>
-          <Text style={p.name}>잘 지내.</Text>
+        <View style={styles.theirRow}>
+          <Avatar source={photos.portrait} size={30} />
+          <View style={[styles.bubble, styles.left]}>
+            <Text style={p.name}>잘 지내.</Text>
+          </View>
         </View>
         <View style={[styles.bubble, styles.right]}>
-          <Text style={p.name}>너도 잘 지내.</Text>
+          <Text style={styles.myText}>너도 잘 지내.</Text>
         </View>
-        <Text style={[p.caption, styles.time]}>오전 2:41</Text>
+        <Text style={[p.caption, styles.time]}>오전 2:47</Text>
       </FadeIn>
-      <FadeIn delay={500}>
+      <FadeIn delay={400}>
         <View style={styles.inputBar}>
-          <Text style={draft && typed ? p.name : p.caption}>
+          <Text style={p.icon}>＋</Text>
+          <Text style={[draft && typed ? p.name : p.caption, { flex: 1 }]}>
             {draft ? typed : "메시지 입력"}
             {draft && !done && <Text style={p.caption}>|</Text>}
           </Text>
-          <Text style={[p.caption, styles.send]}>↑</Text>
+          {draft ? (
+            <View style={styles.send}>
+              <Text style={styles.sendIcon}>↑</Text>
+            </View>
+          ) : (
+            <Text style={p.icon}>☺</Text>
+          )}
         </View>
       </FadeIn>
-    </SceneCard>
+      {draft && (
+        <FadeIn delay={700} rise={14}>
+          <View style={styles.keyboard}>
+            {[
+              "ㅂ ㅈ ㄷ ㄱ ㅅ ㅛ ㅕ ㅑ ㅐ ㅔ",
+              "ㅁ ㄴ ㅇ ㄹ ㅎ ㅗ ㅓ ㅏ ㅣ",
+              "⇧ ㅋ ㅌ ㅊ ㅍ ㅠ ㅜ ㅡ ⌫",
+            ].map((row) => (
+              <Text key={row} style={styles.keyRow}>
+                {row}
+              </Text>
+            ))}
+            <Text style={styles.keyRow}>123{"   "}한/영{"   "}스페이스{"   "}줄바꿈</Text>
+          </View>
+        </FadeIn>
+      )}
+    </AppPanel>
   );
 }
 
-// 02.14 꺼진 화면 · 02.15 보내지 않은 새벽
-function ScreenOff({ afterglow }: { afterglow?: boolean }) {
-  return (
-    <SceneCard style={styles.off}>
-      <FadeIn delay={400} duration={1600} rise={0}>
-        <Text style={styles.clock}>{afterglow ? "오전 2:47" : ""}</Text>
-        <View style={styles.glow} />
-      </FadeIn>
-    </SceneCard>
-  );
-}
-
+// 02.14 꺼진 화면과 02.15 여운은 시안대로 패널 없이 배경과 서사만 보여줍니다.
 export function JaniCard({ scene }: { scene: SceneId }) {
   if (scene === "enter") return <ChatList />;
   if (scene === "choice") return <ChatRoom />;
   if (scene === "actionA") return <ChatRoom draft />;
-  if (scene === "actionB") return <ScreenOff />;
-  return <ScreenOff afterglow />;
+  return null;
 }
 
 const styles = StyleSheet.create({
-  header: { color: t.muted, fontFamily: t.sans, fontSize: 12, marginBottom: 8 },
+  listHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  listTitle: { color: t.text, fontFamily: t.sans, fontSize: 17, fontWeight: "600" },
   searchBar: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    minHeight: 42,
+    minHeight: 40,
     borderRadius: 12,
     paddingHorizontal: 14,
-    backgroundColor: "#2a261f",
-    marginBottom: 10,
+    backgroundColor: "#262219",
+    marginBottom: 6,
   },
-  preview: { flex: 1, gap: 2 },
-  roomHeader: { paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: t.line },
+  roomHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingBottom: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(245,239,227,0.1)",
+  },
+  theirRow: { flexDirection: "row", alignItems: "flex-end", gap: 8, marginTop: 14 },
   bubble: {
     maxWidth: "70%",
-    paddingVertical: 10,
+    paddingVertical: 9,
     paddingHorizontal: 14,
     borderRadius: 16,
-    marginTop: 12,
   },
-  left: { alignSelf: "flex-start", backgroundColor: "#2a261f" },
-  right: { alignSelf: "flex-end", backgroundColor: "#3a3327" },
+  left: { alignSelf: "flex-start", backgroundColor: "#262219" },
+  right: { alignSelf: "flex-end", backgroundColor: t.text, marginTop: 10 },
+  myText: { color: "#1b1813", fontFamily: t.sans, fontSize: 14 },
   time: { alignSelf: "flex-end", marginTop: 6 },
   inputBar: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    gap: 10,
     minHeight: 42,
     borderRadius: 21,
-    paddingHorizontal: 16,
-    backgroundColor: "#2a261f",
-    marginTop: 16,
+    paddingHorizontal: 14,
+    backgroundColor: "#262219",
+    marginTop: 14,
   },
-  send: { fontSize: 16 },
-  off: { height: 200, backgroundColor: "#0b0a08", justifyContent: "center", alignItems: "center" },
-  clock: { color: "rgba(245,239,227,0.35)", fontFamily: t.sans, fontSize: 24, textAlign: "center", marginBottom: 14 },
-  glow: { height: 1, width: 140, backgroundColor: "rgba(245,239,227,0.12)" },
+  send: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: t.text,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sendIcon: { color: "#1b1813", fontSize: 15, fontWeight: "700" },
+  keyboard: { marginTop: 12, gap: 8, paddingVertical: 10, borderRadius: 10, backgroundColor: "#1d1a14" },
+  keyRow: {
+    color: t.muted,
+    fontFamily: t.sans,
+    fontSize: 13,
+    letterSpacing: 2,
+    textAlign: "center",
+  },
 });

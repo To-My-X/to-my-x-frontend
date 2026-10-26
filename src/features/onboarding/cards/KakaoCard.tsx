@@ -1,14 +1,21 @@
+import { Image } from "expo-image";
 import { useEffect, useState } from "react";
-import { Animated, Easing, Platform, StyleSheet, Text, View } from "react-native";
+import {
+  Animated,
+  Easing,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { tokens as t } from "@/theme/tokens";
 import { FadeIn } from "../fade-in";
 import type { SceneId } from "../episodes";
-import { Avatar, Photo, SceneCard, pieceStyles as p } from "./pieces";
+import { AppPanel, Avatar, BlankAvatar, photos, pieceStyles as p } from "./pieces";
 
 const native = Platform.OS !== "web";
-const friends = ["민서", "지우", "서연"];
 
-// 02.01~02.05 카톡 에피소드 연출. 친구 목록이 살짝 흐르다 X의 프로필이 눈에 들어오는 장면입니다.
+// 02.01 친구 목록 · 02.05 다시 친구 목록. 목록이 살짝 흐른 뒤 X의 바뀐 프로필이 눈에 들어옵니다.
 function FriendList({ animated }: { animated: boolean }) {
   const [scroll] = useState(() => new Animated.Value(0));
   useEffect(() => {
@@ -23,96 +30,155 @@ function FriendList({ animated }: { animated: boolean }) {
     animation.start();
     return () => animation.stop();
   }, [animated, scroll]);
-  const translateY = scroll.interpolate({ inputRange: [0, 1], outputRange: [0, -14] });
+  const translateY = scroll.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, -12],
+  });
   return (
-    <SceneCard>
-      <Text style={styles.header}>친구</Text>
+    <AppPanel>
+      <View style={styles.listHeader}>
+        <Text style={styles.listTitle}>친구</Text>
+        <Text style={p.icon}>⌕ ＋ ⚙</Text>
+      </View>
+      <Text style={p.caption}>친구 128</Text>
       <Animated.View style={animated && { transform: [{ translateY }] }}>
-        {friends.map((name) => (
-          <View key={name} style={p.row}>
-            <Avatar label={name[0]} />
-            <Text style={p.name}>{name}</Text>
+        <View style={p.row}>
+          <BlankAvatar />
+          <View>
+            <Text style={p.name}>민서</Text>
+            <Text style={p.caption}>오늘도 좋은 하루</Text>
           </View>
-        ))}
+        </View>
         <FadeIn delay={animated ? 1500 : 200} duration={900} rise={6}>
           <View style={[p.row, styles.highlight]}>
-            <Avatar label="X" warm size={44} />
+            <Avatar source={photos.couple} size={48} />
             <View>
               <Text style={p.name}>X</Text>
-              <Text style={p.caption}>프로필 사진이 바뀌었어요</Text>
+              <Text style={p.caption}>업데이트된 프로필</Text>
             </View>
           </View>
         </FadeIn>
+        <View style={p.row}>
+          <BlankAvatar />
+          <Text style={p.name}>지우</Text>
+        </View>
+        <View style={p.row}>
+          <BlankAvatar />
+          <Text style={p.name}>서연</Text>
+        </View>
       </Animated.View>
-    </SceneCard>
+    </AppPanel>
   );
 }
 
-// 02.02 프로필 · 02.04 잠깐의 정지(흐려진 프로필)
-function Profile({ paused }: { paused?: boolean }) {
+// 02.02 프로필 화면
+function Profile() {
   return (
-    <SceneCard style={paused && { opacity: 0.45 }}>
-      <FadeIn duration={1000}>
-        <Photo style={styles.profilePhoto} />
-      </FadeIn>
-      <FadeIn delay={500}>
+    <AppPanel>
+      <View style={styles.profileHeader}>
+        <Text style={p.icon}>‹</Text>
+        <Text style={p.caption}>프로필</Text>
+        <Text style={p.icon}>⋯</Text>
+      </View>
+      <FadeIn duration={1000} style={styles.profileCenter}>
+        <Image
+          source={photos.couple}
+          contentFit="cover"
+          accessible={false}
+          style={styles.profilePhoto}
+        />
         <Text style={[p.name, styles.profileName]}>X</Text>
-        <View style={styles.profileActions}>
-          {["1:1 채팅", "통화하기", "페이스톡"].map((label) => (
-            <Text key={label} style={p.caption}>
-              {label}
-            </Text>
-          ))}
-        </View>
+        <Text style={p.caption}>사진을 누르면 크게 볼 수 있어요</Text>
       </FadeIn>
-    </SceneCard>
+      <View style={styles.profileActions}>
+        {["1:1 채팅", "통화하기", "페이스톡"].map((label) => (
+          <Text key={label} style={p.caption}>
+            {label}
+          </Text>
+        ))}
+      </View>
+    </AppPanel>
   );
 }
 
 // 02.03 사진을 크게 본 장면
 function PhotoViewer() {
   return (
-    <SceneCard style={styles.viewer}>
-      <View style={styles.viewerTop}>
-        <Text style={p.caption}>‹</Text>
-        <Text style={p.caption}>1/1</Text>
+    <AppPanel style={styles.viewer}>
+      <View style={styles.viewerHeader}>
+        <Text style={p.icon}>×</Text>
+        <Text style={p.caption}>프로필 사진</Text>
+        <View style={{ width: 16 }} />
       </View>
       <FadeIn duration={1200} rise={0}>
-        <Photo style={styles.viewerPhoto} />
+        <Image
+          source={photos.couple}
+          contentFit="cover"
+          accessible={false}
+          style={styles.viewerPhoto}
+        />
       </FadeIn>
-    </SceneCard>
+      <View style={styles.viewerFooter}>
+        <Text style={p.caption}>1/1</Text>
+        <Text style={p.caption}>저장 공유</Text>
+      </View>
+    </AppPanel>
   );
 }
 
+// 02.04 잠깐의 정지와 02.05 여운은 시안대로 별도 패널 없이 배경과 서사만 보여줍니다.
 export function KakaoCard({ scene }: { scene: SceneId }) {
   if (scene === "enter") return <FriendList animated />;
   if (scene === "choice") return <Profile />;
   if (scene === "actionA") return <PhotoViewer />;
-  if (scene === "actionB") return <Profile paused />;
+  if (scene === "actionB") return null;
   return <FriendList animated={false} />;
 }
 
 const styles = StyleSheet.create({
-  header: { color: t.muted, fontFamily: t.sans, fontSize: 12, marginBottom: 16 },
-  highlight: {
-    marginTop: 6,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: t.line,
-    backgroundColor: "#262219",
+  listHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
   },
-  profilePhoto: { height: 150 },
-  profileName: { textAlign: "center", marginTop: 14, fontSize: 16 },
+  listTitle: { color: t.text, fontFamily: t.sans, fontSize: 17, fontWeight: "600" },
+  highlight: {
+    paddingHorizontal: 12,
+    marginHorizontal: -12,
+    borderRadius: 14,
+    backgroundColor: "rgba(245,239,227,0.06)",
+  },
+  profileHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+  profileCenter: { alignItems: "center", gap: 8 },
+  profilePhoto: { width: 108, height: 108, borderRadius: 44 },
+  profileName: { fontSize: 16, marginTop: 4 },
   profileActions: {
     flexDirection: "row",
     justifyContent: "space-around",
     marginTop: 16,
     paddingTop: 14,
     borderTopWidth: 1,
-    borderTopColor: t.line,
+    borderTopColor: "rgba(245,239,227,0.1)",
   },
-  viewer: { backgroundColor: "#121008" },
-  viewerTop: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
-  viewerPhoto: { height: 190 },
+  viewer: { backgroundColor: "#0d0b08", padding: 12 },
+  viewerHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+    paddingHorizontal: 4,
+  },
+  viewerPhoto: { width: "100%", aspectRatio: 4 / 3, borderRadius: 10 },
+  viewerFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 10,
+    paddingHorizontal: 4,
+  },
 });
