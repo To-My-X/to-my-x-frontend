@@ -19,3 +19,39 @@ test('every episode has the five scenes and valid transitions', () => {
     }
   }
 });
+
+test("progress persists, rejects corrupt data, rebuilds back path", async () => {
+  const { loadProgress, saveProgress, historyFor } = await import(
+    "../src/features/onboarding/progress.ts"
+  );
+  // Node 25의 내장 localStorage는 백업 파일 없이는 동작하지 않으므로 메모리 경로를 검증합니다.
+  Object.defineProperty(globalThis, "localStorage", {
+    value: undefined,
+    configurable: true,
+    writable: true,
+  });
+  assert.equal(loadProgress(), null);
+  for (const episode of episodeIds)
+    for (const scene of Object.keys(episodes[episode])) {
+      saveProgress({ episode, scene, done: false });
+      assert.deepEqual(
+        loadProgress(),
+        { episode, scene, done: false },
+        `${episode}/${scene} roundtrip`,
+      );
+    }
+  globalThis.localStorage = {
+    getItem: () => '{"episode":"none","scene":"enter"}',
+    setItem: () => {},
+  };
+  assert.equal(loadProgress(), null, "unknown episode is ignored");
+  globalThis.localStorage = {
+    getItem: () => "{broken",
+    setItem: () => {},
+  };
+  assert.equal(loadProgress(), null, "corrupt json is ignored");
+  delete globalThis.localStorage;
+  assert.deepEqual(historyFor("enter"), []);
+  assert.deepEqual(historyFor("actionB"), ["enter", "choice"]);
+  assert.deepEqual(historyFor("afterglow"), ["enter", "choice", "actionA"]);
+});
