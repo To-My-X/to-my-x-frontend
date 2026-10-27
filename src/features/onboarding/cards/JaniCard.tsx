@@ -14,13 +14,13 @@ function ChatList() {
         <Text style={styles.listTitle}>채팅</Text>
         <Text style={p.icon}>⌕ ＋</Text>
       </View>
-      <View style={styles.searchBar}>
-        <Text style={p.icon}>⌕</Text>
+      <View style={styles.searchLine}>
         <Text style={p.name}>
           {typed}
           {!done && <Text style={p.caption}>|</Text>}
         </Text>
       </View>
+      <Text style={[p.caption, styles.section]}>채팅방</Text>
       <FadeIn delay={1400} duration={1000}>
         <View style={p.row}>
           <Avatar source={photos.portrait} size={46} />
@@ -28,9 +28,10 @@ function ChatList() {
             <Text style={p.name}>X</Text>
             <Text style={p.caption}>너도 잘 지내.</Text>
           </View>
-          <Text style={p.caption}>오전 2:47</Text>
+          <Text style={p.caption}>오래전</Text>
         </View>
       </FadeIn>
+      <Text style={[p.caption, styles.clock]}>오전 2:47</Text>
     </AppPanel>
   );
 }
@@ -45,19 +46,27 @@ function ChatRoom({ draft }: { draft?: boolean }) {
         <Text style={p.name}>X</Text>
         <Text style={p.icon}>⌕ ≡</Text>
       </View>
-      <FadeIn duration={900}>
-        <View style={styles.theirRow}>
-          <Avatar source={photos.portrait} size={30} />
-          <View style={[styles.bubble, styles.left]}>
-            <Text style={p.name}>잘 지내.</Text>
+      {draft ? (
+        <View style={[styles.bubble, styles.mine, styles.draftLast]}>
+          <Text style={p.name}>너도 잘 지내.</Text>
+        </View>
+      ) : (
+        <FadeIn duration={900}>
+          <Text style={[p.caption, styles.section, { textAlign: "center" }]}>
+            마지막 대화
+          </Text>
+          <View style={styles.theirRow}>
+            <Avatar source={photos.portrait} size={30} />
+            <View style={[styles.bubble, styles.theirs]}>
+              <Text style={p.name}>잘 지내.</Text>
+            </View>
           </View>
-        </View>
-        <View style={[styles.bubble, styles.right]}>
-          <Text style={styles.myText}>너도 잘 지내.</Text>
-        </View>
-        <Text style={[p.caption, styles.time]}>오전 2:47</Text>
-      </FadeIn>
-      <FadeIn delay={400}>
+          <View style={[styles.bubble, styles.mine]}>
+            <Text style={p.name}>너도 잘 지내.</Text>
+          </View>
+        </FadeIn>
+      )}
+      <FadeIn delay={draft ? 300 : 500}>
         <View style={styles.inputBar}>
           <Text style={p.icon}>＋</Text>
           <Text style={[draft && typed ? p.name : p.caption, { flex: 1 }]}>
@@ -69,7 +78,7 @@ function ChatRoom({ draft }: { draft?: boolean }) {
               <Text style={styles.sendIcon}>↑</Text>
             </View>
           ) : (
-            <Text style={p.icon}>☺</Text>
+            <Text style={styles.emoji}>😌</Text>
           )}
         </View>
       </FadeIn>
@@ -85,7 +94,9 @@ function ChatRoom({ draft }: { draft?: boolean }) {
                 {row}
               </Text>
             ))}
-            <Text style={styles.keyRow}>123{"   "}한/영{"   "}스페이스{"   "}줄바꿈</Text>
+            <Text style={styles.keyRow}>
+              123{"   "}한/영{"   "}스페이스{"   "}줄바꿈
+            </Text>
           </View>
         </FadeIn>
       )}
@@ -106,38 +117,45 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 12,
   },
-  listTitle: { color: t.text, fontFamily: t.sans, fontSize: 17, fontWeight: "600" },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    minHeight: 40,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    backgroundColor: "#262219",
-    marginBottom: 6,
+  listTitle: {
+    color: t.text,
+    fontFamily: t.sans,
+    fontSize: 17,
+    fontWeight: "600",
   },
+  searchLine: {
+    minHeight: 34,
+    justifyContent: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(245,239,227,0.14)",
+    marginBottom: 12,
+  },
+  section: { marginBottom: 4 },
+  clock: { textAlign: "center", marginTop: 26, marginBottom: 6 },
   roomHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingBottom: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(245,239,227,0.1)",
+    marginBottom: 10,
   },
-  theirRow: { flexDirection: "row", alignItems: "flex-end", gap: 8, marginTop: 14 },
+  theirRow: {
+    flexDirection: "row",
+    alignItems: "flex-end",
+    gap: 8,
+    marginTop: 8,
+  },
   bubble: {
     maxWidth: "70%",
     paddingVertical: 9,
     paddingHorizontal: 14,
     borderRadius: 16,
   },
-  left: { alignSelf: "flex-start", backgroundColor: "#262219" },
-  right: { alignSelf: "flex-end", backgroundColor: t.text, marginTop: 10 },
-  myText: { color: "#1b1813", fontFamily: t.sans, fontSize: 14 },
-  time: { alignSelf: "flex-end", marginTop: 6 },
+  theirs: { alignSelf: "flex-start", backgroundColor: "#262219" },
+  mine: { alignSelf: "flex-end", backgroundColor: "#3f3a30", marginTop: 10 },
+  draftLast: { marginBottom: 34 },
   inputBar: {
     flexDirection: "row",
     alignItems: "center",
@@ -145,21 +163,27 @@ const styles = StyleSheet.create({
     minHeight: 42,
     borderRadius: 21,
     paddingHorizontal: 14,
-    backgroundColor: "#262219",
-    marginTop: 14,
+    backgroundColor: "#211d17",
+    marginTop: 16,
   },
+  emoji: { fontSize: 15 },
   send: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: t.text,
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    backgroundColor: "#4a443a",
     alignItems: "center",
     justifyContent: "center",
   },
-  sendIcon: { color: "#1b1813", fontSize: 15, fontWeight: "700" },
-  keyboard: { marginTop: 12, gap: 8, paddingVertical: 10, borderRadius: 10, backgroundColor: "#1d1a14" },
+  sendIcon: { color: t.text, fontSize: 15, fontWeight: "700" },
+  keyboard: {
+    marginTop: 14,
+    gap: 10,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
   keyRow: {
-    color: t.muted,
+    color: "#d8d0c0",
     fontFamily: t.sans,
     fontSize: 13,
     letterSpacing: 2,

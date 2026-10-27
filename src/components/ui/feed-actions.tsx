@@ -78,12 +78,10 @@ export function ActionButton({
   label,
   onPress,
   disabled = false,
-  bright = false,
 }: {
   label: string;
   onPress?: () => void;
   disabled?: boolean;
-  bright?: boolean;
 }) {
   return (
     <Pressable
@@ -93,14 +91,11 @@ export function ActionButton({
       onPress={onPress}
       style={({ pressed }) => [
         styles.button,
-        bright && styles.brightButton,
         (disabled || !onPress) && { opacity: 0.45 },
         pressed && { opacity: 0.7 },
       ]}
     >
-      <Text style={[styles.buttonText, bright && styles.brightButtonText]}>
-        {label}
-      </Text>
+      <Text style={styles.buttonText}>{label}</Text>
     </Pressable>
   );
 }
@@ -129,6 +124,4 @@ const styles = StyleSheet.create({
     backgroundColor: t.surface,
   },
   buttonText: { fontFamily: t.sans, color: t.text, fontSize: 14 },
-  brightButton: { backgroundColor: t.text, borderColor: t.text },
-  brightButtonText: { color: "#1b1813", fontWeight: "600" },
 });
