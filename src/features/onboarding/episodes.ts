@@ -1,4 +1,4 @@
-// 02.01~02.15 장면·CTA 전이. CTA 문구와 전이는 온보딩 스펙 IA 표, 서사 문구는 디자인 추출본 기준입니다.
+// 02.01~02.15 장면·CTA 전이. CTA 문구와 전이는 온보딩 스펙 IA 표, 서사 문구는 2026-10-27 사용자 제공 시안 이미지와 대조한 원문입니다.
 export type SceneId = "enter" | "choice" | "actionA" | "actionB" | "afterglow";
 export type EpisodeId = "kakao" | "insta" | "jani";
 export type Cta = { label: string; to: SceneId | "write" };
@@ -36,8 +36,8 @@ export const episodes: Record<EpisodeId, Record<SceneId, Scene>> = {
       screen: "02.03",
       title: "사진을 보며 든 생각",
       lines: [
-        "너는 연애 중이구나.\n그런 생각이 들었다.",
-        "옆 사람보다 네 표정을 오래 봤다.",
+        "너는 연애 중이구나.",
+        "그런 생각이 들었다.\n옆 사람보다 네 표정을 오래 봤다.",
       ],
       ctas: [{ label: "프로필을 닫는다", to: "afterglow" }],
     },
@@ -103,7 +103,10 @@ export const episodes: Record<EpisodeId, Record<SceneId, Scene>> = {
     afterglow: {
       screen: "02.10",
       title: "화면을 덮으며",
-      lines: ["다른 게 궁금해졌다.", "네 근황은 잠깐 마음에 남았다."],
+      lines: [
+        "잘 지내는지 궁금했는데,\n다른 게 궁금해졌다.",
+        "화면은 닫았다.\n네 근황은 잠깐 마음에 남았다.",
+      ],
       prompt: true,
       ctas: [{ label: "이 마음 남기기", to: "write" }],
     },
@@ -121,7 +124,7 @@ export const episodes: Record<EpisodeId, Record<SceneId, Scene>> = {
     choice: {
       screen: "02.12",
       title: "멈춰 있는 대화",
-      lines: ["마지막 대화,\n두 글자 다음으로,\n아무 말도 늘어나지 않았다."],
+      lines: ["마지막 대화 아래로,\n아무 말도 늘어나지 않았다."],
       ctas: [
         { label: "두 글자를 써본다", to: "actionA" },
         { label: "그냥 닫는다", to: "actionB" },
@@ -131,7 +134,7 @@ export const episodes: Record<EpisodeId, Record<SceneId, Scene>> = {
       screen: "02.13",
       title: "보내기 직전",
       lines: [
-        "손이 가지 않았다.",
+        "두 글자 다음으로,\n손이 가지 않았다.",
         "답이 오면,\n그다음엔 무슨 말을 하고 싶었을까.",
       ],
       ctas: [{ label: "두 글자를 지운다", to: "afterglow" }],
@@ -149,7 +152,10 @@ export const episodes: Record<EpisodeId, Record<SceneId, Scene>> = {
     afterglow: {
       screen: "02.15",
       title: "보내지 않은 새벽",
-      lines: ["말은 보내지 않고,\n휴대폰을 내려놓았다.", "오늘은 여기까지."],
+      lines: [
+        "말은 보내지 않고,\n휴대폰을 내려놓았다.",
+        "방은 다시 조용해졌다.\n오늘은 여기까지.",
+      ],
       prompt: true,
       ctas: [{ label: "이 마음 남기기", to: "write" }],
     },

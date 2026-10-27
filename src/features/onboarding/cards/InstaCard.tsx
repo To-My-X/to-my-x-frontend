@@ -1,9 +1,12 @@
 import { Image } from "expo-image";
-import { StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Animated, Easing, StyleSheet, Text, View } from "react-native";
 import { FadeIn } from "../fade-in";
 import type { SceneId } from "../episodes";
 import { AppPanel, Avatar, photos, pieceStyles as p } from "./pieces";
 import { useTyping } from "../use-typing";
+
+const CELL = 94;
 
 function TabBar() {
   return (
@@ -34,7 +37,7 @@ function Search() {
           <Avatar source={photos.portrait} size={44} round />
           <View style={{ flex: 1 }}>
             <Text style={p.name}>x.archive</Text>
-            <Text style={p.caption}>X</Text>
+            <Text style={p.caption}>x</Text>
           </View>
           <Text style={p.icon}>×</Text>
         </View>
@@ -44,11 +47,38 @@ function Search() {
   );
 }
 
-// 02.07 계정 프로필. 최근 게시물 한 장이 새로 떠오릅니다.
+// 새 게시물 칸이 벌어지며 추가되는 연출. 기존 사진들이 옆으로 밀려납니다.
+function NewPostCell() {
+  const [width] = useState(() => new Animated.Value(0));
+  useEffect(() => {
+    const animation = Animated.timing(width, {
+      toValue: CELL,
+      duration: 900,
+      delay: 900,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    });
+    animation.start();
+    return () => animation.stop();
+  }, [width]);
+  return (
+    <Animated.View style={[styles.newCell, { width }]}>
+      <Image
+        source={photos.cafe}
+        contentFit="cover"
+        accessible={false}
+        style={styles.cellPhoto}
+      />
+    </Animated.View>
+  );
+}
+
+// 02.07 계정 프로필. 최근 게시물 한 장이 그리드 맨 앞에 생깁니다.
 function Account() {
   return (
     <AppPanel>
-      <View style={styles.accountHeader}>
+      <View style={styles.centerHeader}>
+        <Text style={p.icon}>‹</Text>
         <Text style={p.name}>x.archive</Text>
         <Text style={p.icon}>⋯</Text>
       </View>
@@ -78,23 +108,23 @@ function Account() {
           <Text style={p.caption}>메시지</Text>
         </View>
       </View>
-      <Text style={[p.caption, styles.gridLabel]}>최근 게시물 · 사진 2장</Text>
+      <Text style={[p.icon, styles.gridTab]}>▦</Text>
       <View style={styles.grid}>
-        <FadeIn delay={900} duration={1100} rise={0}>
-          <Image
-            source={photos.cafe}
-            contentFit="cover"
-            accessible={false}
-            style={styles.cell}
-          />
-        </FadeIn>
+        <NewPostCell />
+        <Image
+          source={photos.bedroom}
+          contentFit="cover"
+          accessible={false}
+          style={[styles.cellPhoto, styles.cellGap]}
+        />
         <Image
           source={photos.portrait}
           contentFit="cover"
           accessible={false}
-          style={styles.cell}
+          style={styles.cellPhoto}
         />
       </View>
+      <Text style={[p.caption, styles.gridLabel]}>최근 게시물 · 사진 2장</Text>
       <TabBar />
     </AppPanel>
   );
@@ -104,8 +134,9 @@ function Account() {
 function Post() {
   return (
     <AppPanel>
-      <View style={styles.accountHeader}>
-        <Text style={p.caption}>‹ 게시물</Text>
+      <View style={styles.centerHeader}>
+        <Text style={p.icon}>‹</Text>
+        <Text style={p.caption}>게시물</Text>
         <Text style={p.icon}>⋯</Text>
       </View>
       <View style={p.row}>
@@ -122,8 +153,10 @@ function Post() {
       </FadeIn>
       <View style={styles.postActions}>
         <Text style={p.icon}>♡ ◯ ➤</Text>
-        <Text style={p.caption}>2/2</Text>
-        <Text style={p.icon}>⎙</Text>
+        <View style={styles.postActionsRight}>
+          <Text style={p.caption}>2 / 2</Text>
+          <Text style={p.icon}>⎙</Text>
+        </View>
       </View>
       <Text style={p.name}>x.archive 고마워</Text>
       <Text style={p.caption}>1일 전</Text>
@@ -150,7 +183,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#262219",
     marginBottom: 8,
   },
-  accountHeader: {
+  centerHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -167,16 +200,25 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#262219",
   },
-  gridLabel: { marginBottom: 6 },
-  grid: { flexDirection: "row", gap: 3 },
-  cell: { width: 96, aspectRatio: 1, borderRadius: 4 },
-  postPhoto: { width: "100%", aspectRatio: 4 / 3, borderRadius: 8, marginTop: 6 },
+  gridTab: { textAlign: "center", marginBottom: 10 },
+  grid: { flexDirection: "row" },
+  newCell: { overflow: "hidden", marginRight: 3, borderRadius: 4 },
+  cellPhoto: { width: CELL, height: CELL, borderRadius: 4 },
+  cellGap: { marginRight: 3 },
+  gridLabel: { marginTop: 6 },
+  postPhoto: {
+    width: "100%",
+    aspectRatio: 4 / 3,
+    borderRadius: 8,
+    marginTop: 6,
+  },
   postActions: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginVertical: 10,
   },
+  postActionsRight: { flexDirection: "row", alignItems: "center", gap: 10 },
   tabBar: {
     flexDirection: "row",
     justifyContent: "space-between",

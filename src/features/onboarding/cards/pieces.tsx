@@ -65,7 +65,7 @@ export function BlankAvatar({ size = 44 }: { size?: number }) {
         width: size,
         height: size,
         borderRadius: size * 0.4,
-        backgroundColor: "#2e2a23",
+        backgroundColor: "transparent",
       }}
     />
   );

@@ -16,10 +16,9 @@ import { AppPanel, Avatar, BlankAvatar, photos, pieceStyles as p } from "./piece
 const native = Platform.OS !== "web";
 
 // 02.01 친구 목록 · 02.05 다시 친구 목록. 목록이 살짝 흐른 뒤 X의 바뀐 프로필이 눈에 들어옵니다.
-function FriendList({ animated }: { animated: boolean }) {
+function FriendList() {
   const [scroll] = useState(() => new Animated.Value(0));
   useEffect(() => {
-    if (!animated) return;
     const animation = Animated.timing(scroll, {
       toValue: 1,
       duration: 1400,
@@ -29,7 +28,7 @@ function FriendList({ animated }: { animated: boolean }) {
     });
     animation.start();
     return () => animation.stop();
-  }, [animated, scroll]);
+  }, [scroll]);
   const translateY = scroll.interpolate({
     inputRange: [0, 1],
     outputRange: [0, -12],
@@ -40,8 +39,8 @@ function FriendList({ animated }: { animated: boolean }) {
         <Text style={styles.listTitle}>친구</Text>
         <Text style={p.icon}>⌕ ＋ ⚙</Text>
       </View>
-      <Text style={p.caption}>친구 128</Text>
-      <Animated.View style={animated && { transform: [{ translateY }] }}>
+      <Text style={[p.caption, styles.count]}>친구 128</Text>
+      <Animated.View style={{ transform: [{ translateY }] }}>
         <View style={p.row}>
           <BlankAvatar />
           <View>
@@ -49,12 +48,12 @@ function FriendList({ animated }: { animated: boolean }) {
             <Text style={p.caption}>오늘도 좋은 하루</Text>
           </View>
         </View>
-        <FadeIn delay={animated ? 1500 : 200} duration={900} rise={6}>
-          <View style={[p.row, styles.highlight]}>
+        <FadeIn delay={1500} duration={900} rise={6}>
+          <View style={p.row}>
             <Avatar source={photos.couple} size={48} />
             <View>
               <Text style={p.name}>X</Text>
-              <Text style={p.caption}>업데이트된 프로필</Text>
+              <Text style={p.caption}>업데이트한 프로필</Text>
             </View>
           </View>
         </FadeIn>
@@ -108,7 +107,7 @@ function PhotoViewer() {
       <View style={styles.viewerHeader}>
         <Text style={p.icon}>×</Text>
         <Text style={p.caption}>프로필 사진</Text>
-        <View style={{ width: 16 }} />
+        <Text style={p.icon}>⋯</Text>
       </View>
       <FadeIn duration={1200} rise={0}>
         <Image
@@ -128,11 +127,10 @@ function PhotoViewer() {
 
 // 02.04 잠깐의 정지와 02.05 여운은 시안대로 별도 패널 없이 배경과 서사만 보여줍니다.
 export function KakaoCard({ scene }: { scene: SceneId }) {
-  if (scene === "enter") return <FriendList animated />;
+  if (scene === "enter") return <FriendList />;
   if (scene === "choice") return <Profile />;
   if (scene === "actionA") return <PhotoViewer />;
-  if (scene === "actionB") return null;
-  return <FriendList animated={false} />;
+  return null;
 }
 
 const styles = StyleSheet.create({
@@ -143,12 +141,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   listTitle: { color: t.text, fontFamily: t.sans, fontSize: 17, fontWeight: "600" },
-  highlight: {
-    paddingHorizontal: 12,
-    marginHorizontal: -12,
-    borderRadius: 14,
-    backgroundColor: "rgba(245,239,227,0.06)",
-  },
+  count: { marginBottom: 14 },
   profileHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
