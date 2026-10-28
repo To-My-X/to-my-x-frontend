@@ -62,7 +62,11 @@ export default function LoginRoute() {
     setPhase("busy");
     kakaoNativeLogin()
       .then(({ idToken, nonce }) => loginWithKakaoIdToken(idToken, nonce))
-      .catch((error) => setPhase(isKakaoCancel(error) ? "idle" : "failed"));
+      .catch((error) => {
+        // 개발 환경에서 실패 지점(SDK·토큰·서버 교환)을 구분하기 위한 로그입니다.
+        if (__DEV__) console.warn("[kakao app login]", error);
+        setPhase(isKakaoCancel(error) ? "idle" : "failed");
+      });
   };
   return (
     <LoginScreen
