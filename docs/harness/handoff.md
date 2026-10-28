@@ -12,7 +12,8 @@
 ## 카카오 로그인 실연동 — 2026-10-28
 
 - 서버 Auth API(카카오 웹 코드 로그인·토큰 재발급·로그아웃)를 연동하고 mock-session을 실세션 AuthProvider(auth-session.tsx)로 교체했습니다. 상세와 redirect URI 등록 목록은 [계정 스펙](../specs/account-access.md)의 2026-10-28 기록을 따릅니다.
-- 카카오 REST API 키를 .env.local, EAS preview·production 환경, GitHub Actions 변수에 등록했습니다.
+- 카카오 REST API 키를 .env.local, EAS preview·production 환경, GitHub Actions 변수에 등록했습니다. 네이티브 앱 키는 app.json config plugin과 EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY(.env.local, EAS preview·production)에 등록했습니다.
+- 네이티브 카카오 SDK(@react-native-kakao v2.4)를 추가해 앱 로그인(ID 토큰)을 연결했습니다. 네이티브 모듈 추가로 다음 main 머지는 새 바이너리 빌드·스토어 제출로 배포됩니다. 카카오 콘솔에 Android 패키지·키 해시, iOS 번들 ID 등록이 필요합니다(계정 스펙의 등록값 참조).
 - 검증: lint·타입·단위 테스트 17개 통과(인증 3개 포함). 로컬 웹에서 카카오 계정 페이지 진입까지 확인했으나 인가 단계에서 KOE006 발생 — redirect URI 3종(localhost·develop·prod /login)의 카카오 콘솔 등록을 서버 담당자에게 요청한 상태입니다. 등록 후 실계정 로그인 왕복을 확인합니다.
 
 ## 온보딩 시안 1:1 대조 보정 — 2026-10-27

@@ -197,7 +197,8 @@
 - 08.04 진행 중·08.05 실패 상태를 로그인 시트에 구현했습니다. Apple·Google은 공급자 설정 전 비활성입니다.
 - 클라이언트 키: `EXPO_PUBLIC_KAKAO_CLIENT_ID`(REST API 키, 공개 식별자). 로컬 `.env.local`, EAS preview·production 환경, GitHub Actions 변수(웹 빌드)에 등록했습니다. redirect URI 기본값은 `현재 origin + /login`이며 `EXPO_PUBLIC_KAKAO_REDIRECT_URI`로 재정의할 수 있습니다.
 - 카카오 콘솔 Redirect URI 등록 필요 목록(서버 담당자 전달): `http://localhost:8081/login`, `https://to-my-x--develop.expo.app/login`, `https://to-my-x.expo.app/login`. 미등록 주소에서는 카카오가 로그인 후 인가 단계에서 KOE006으로 거부합니다. 2026-10-28 로컬 확인에서 KOE006이 재현돼 세 주소 모두 등록 대기 상태입니다.
-- 앱(네이티브) 로그인: `POST /login/kakao`(ID 토큰) 호출 함수까지 준비했습니다. 카카오 네이티브 SDK(네이티브 앱키·새 바이너리) 연동은 후속입니다. 필수 동의의 서버 저장 API는 아직 없어 기기 로컬 기록으로 대체합니다.
+- 앱(네이티브) 로그인(2026-10-28): `@react-native-kakao/core`·`user` v2.4를 추가하고 config plugin에 네이티브 앱 키를 설정했습니다. 네이티브의 카카오 버튼은 SDK `login({ nonce })`로 ID 토큰을 받아 `POST /login/kakao`로 교환하며, 이후 동의·복귀·토큰 보존은 웹과 동일합니다. 사용자가 로그인 창을 닫으면 실패가 아닌 취소로 처리합니다. 네이티브 모듈 추가라 다음 main 머지는 OTA가 아닌 새 바이너리 빌드로 배포됩니다. iOS 시뮬레이터에서 SDK 초기화 → 카카오 인증 세션 다이얼로그 표시 → 취소 시 시트 복귀까지 확인했으며, 실계정 로그인과 Android 실행은 확인 대기입니다.
+- 카카오 콘솔 Android 플랫폼 등록값: 패키지 `com.tomyx.android`, 디버그 키 해시 `cKfsac54Xj+f2JUL7K2Xvcg9+NY=`(로컬 개발용). EAS 내부 테스트 빌드용 키 해시는 expo.dev Android credentials의 SHA-1을 base64로 변환해(`echo <SHA1 hex 콜론 제거> | xxd -r -p | openssl base64`) 추가 등록해야 합니다. iOS 플랫폼에는 번들 ID `com.tomyx.ios`를 등록합니다. ID 토큰 발급을 위해 카카오 로그인 OpenID Connect 활성화가 필요합니다. 필수 동의의 서버 저장 API는 아직 없어 기기 로컬 기록으로 대체합니다.
 - mock 로그인은 토큰 없는 화면 연결 검수용으로 유지합니다(개발·EAS preview 한정).
 - 검증: lint·타입·단위 테스트(ApiResponse 봉투·오류 코드·state 생성·위조 거부) 통과. 로컬 웹에서 카카오 버튼 활성화와 카카오 계정 페이지 진입을 확인했습니다(인가는 redirect URI 등록 전이라 KOE006). 실제 계정 로그인→교환→복귀와 재발급·로그아웃의 실서버 왕복은 사용자 계정으로 확인이 필요합니다.
 

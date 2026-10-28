@@ -9,6 +9,7 @@ import {
 } from "react";
 import {
   loginWithKakaoCode as loginWithKakaoCodeApi,
+  loginWithKakaoIdToken as loginWithKakaoIdTokenApi,
   logoutServer,
   refreshTokens,
   type LoginResult,
@@ -32,6 +33,7 @@ type Session = {
   status: SessionStatus;
   memberId: number | null;
   loginWithKakaoCode: (code: string, redirectUri: string) => Promise<void>;
+  loginWithKakaoIdToken: (idToken: string, nonce?: string) => Promise<void>;
   mockLogin: () => void;
   agree: () => void;
   cancelPending: () => void;
@@ -105,6 +107,13 @@ export function AuthProvider({ children }: PropsWithChildren) {
     [apply],
   );
 
+  const loginWithKakaoIdToken = useCallback(
+    async (idToken: string, nonce?: string) => {
+      apply(await loginWithKakaoIdTokenApi(idToken, nonce));
+    },
+    [apply],
+  );
+
   const reset = useCallback(() => {
     const refresh = tokens.current.refresh;
     tokens.current = { access: null, refresh: null };
@@ -122,6 +131,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
         status,
         memberId,
         loginWithKakaoCode,
+        loginWithKakaoIdToken,
         mockLogin: () => {
           if (mockAuthEnabled) setStatus("pending-consent");
         },
