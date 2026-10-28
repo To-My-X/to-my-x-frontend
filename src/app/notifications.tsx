@@ -1,4 +1,4 @@
-import { useMockSession } from "@/features/auth/mock-session";
+import { useSession } from "@/features/auth/auth-session";
 import {
   NotificationsScreen,
   type NotificationItem,
@@ -11,12 +11,12 @@ const mockItems: NotificationItem[] = [
 ];
 
 export default function NotificationsRoute() {
-  const { session } = useMockSession();
+  const { status } = useSession();
   const { scenario } = useLocalSearchParams<{ scenario?: string }>();
   const items = __DEV__ && scenario === "empty" ? [] : mockItems;
   return (
     <NotificationsScreen
-      guest={session !== "ready"}
+      guest={status !== "ready"}
       items={items}
       onBack={() => (router.canGoBack() ? router.back() : router.replace("/"))}
       onLogin={() =>

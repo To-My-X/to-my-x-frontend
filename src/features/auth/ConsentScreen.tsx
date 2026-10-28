@@ -28,8 +28,8 @@ export function ConsentScreen({
   return (
     <FlowPage title="시작하기 전에" onBack={onCancel}>
       <Text style={f.muted}>
-        개발용 동의 흐름입니다. 운영 약관과 서버 저장은 아직 연결되지
-        않았습니다.
+        운영 약관 문서는 준비 중입니다. 동의 상태는 아직 서버에 저장되지 않고
+        이 기기에만 기록됩니다.
       </Text>
       {option("모두 동의하기", all, () => setChecked([!all, !all, !all]))}
       {[

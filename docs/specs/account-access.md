@@ -187,6 +187,20 @@
 
 2026-10-21: [화면 연결 골격](product-overview.md#7-화면-연결-골격--2026-10-21)에 따라 글쓰기 로그인 시트·개발용 mock 동의·취소 복귀를 구현합니다. 실제 OAuth와 운영 동의 저장은 연결하지 않으며, mock 버튼은 개발 환경에서만 제공합니다.
 
+## 카카오 로그인 실연동 — 2026-10-28
+
+서버 `https://api-tomyx.rhkr8521.com`(/api/v1/auth)와 카카오 웹 로그인을 연동했습니다.
+
+- 웹(08.01~03): 카카오 인가 코드 플로우. `scope=openid` 포함 인가 요청 → `/login` 콜백의 `code`를 `POST /api/v1/auth/login/kakao/code`로 교환합니다. state는 난수+복귀 키로 만들어 sessionStorage 보관값과 대조하고, 불일치는 실패(08.05)로 처리합니다. 성공 응답의 `newMember` 또는 이 기기의 동의 기록 부재 시 08.06 동의로 보냅니다.
+- 세션: access 토큰은 메모리, refresh 토큰·memberId·동의 여부는 `tomyx.auth.v1`(웹 localStorage, 네이티브는 세션 메모리)에 보존합니다. 앱 시작 시 refresh 회전(`POST /token/refresh`)으로 복원하고 실패하면 게스트로 시작합니다. 사용한 refresh 토큰은 재사용되지 않으므로 회전 결과를 항상 저장합니다.
+- 로그아웃(09.04)·동의 전 이탈: `POST /logout`으로 토큰 계열을 폐기(실패해도 로컬 정리 유지)하고 게스트로 돌아갑니다.
+- 08.04 진행 중·08.05 실패 상태를 로그인 시트에 구현했습니다. Apple·Google은 공급자 설정 전 비활성입니다.
+- 클라이언트 키: `EXPO_PUBLIC_KAKAO_CLIENT_ID`(REST API 키, 공개 식별자). 로컬 `.env.local`, EAS preview·production 환경, GitHub Actions 변수(웹 빌드)에 등록했습니다. redirect URI 기본값은 `현재 origin + /login`이며 `EXPO_PUBLIC_KAKAO_REDIRECT_URI`로 재정의할 수 있습니다.
+- 카카오 콘솔 Redirect URI 등록 필요 목록(서버 담당자 전달): `http://localhost:8081/login`, `https://to-my-x--develop.expo.app/login`, `https://to-my-x.expo.app/login`. 미등록 주소에서는 카카오가 로그인 후 인가 단계에서 KOE006으로 거부합니다. 2026-10-28 로컬 확인에서 KOE006이 재현돼 세 주소 모두 등록 대기 상태입니다.
+- 앱(네이티브) 로그인: `POST /login/kakao`(ID 토큰) 호출 함수까지 준비했습니다. 카카오 네이티브 SDK(네이티브 앱키·새 바이너리) 연동은 후속입니다. 필수 동의의 서버 저장 API는 아직 없어 기기 로컬 기록으로 대체합니다.
+- mock 로그인은 토큰 없는 화면 연결 검수용으로 유지합니다(개발·EAS preview 한정).
+- 검증: lint·타입·단위 테스트(ApiResponse 봉투·오류 코드·state 생성·위조 거부) 통과. 로컬 웹에서 카카오 버튼 활성화와 카카오 계정 페이지 진입을 확인했습니다(인가는 redirect URI 등록 전이라 KOE006). 실제 계정 로그인→교환→복귀와 재발급·로그아웃의 실서버 왕복은 사용자 계정으로 확인이 필요합니다.
+
 2026-10-22: 내부 테스트 빌드에서 화면 골격을 검수할 수 있도록 mock 로그인 활성 조건을 `__DEV__ 또는 EXPO_PUBLIC_MOCK_AUTH=1`로 확장했습니다. 플래그는 EAS preview 환경(testing 빌드·OTA)에만 등록했고 production 환경에는 없으므로 스토어 공개 번들에서는 계속 비활성입니다.
 
 2026-10-22: 로그인·동의는 `?next=<write|my|notifications|settings|feed>` 허용 키로 진입 의도를 보관해 원래 화면으로 복귀합니다. 08.07 게스트 MY, 09.01 설정, 09.02/03 약관·개인정보 자리 문구, 09.04 로그아웃 시트, 09.05/06 탈퇴 확인·완료를 mock으로 연결했습니다. 로그아웃·탈퇴는 mock 세션 정리와 피드 복귀만 수행하며 서버 로그아웃·실제 탈퇴·개인 데이터 정리는 미구현입니다. 08.04/05 진행 중·실패 상태는 실제 공급자 연동과 함께 구현합니다.

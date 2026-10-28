@@ -1,4 +1,4 @@
-import { useMockSession } from "@/features/auth/mock-session";
+import { useSession } from "@/features/auth/auth-session";
 import {
   episodeIds,
   type EpisodeId,
@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from "react";
 // 화면에 뒤로 버튼은 없으며(시안 기준) 시스템 뒤로가 직전 장면을 복원하고,
 // 첫 장면에서는 둘러보기 이력을 남긴 채 그대로 나갑니다.
 export default function OnboardingRoute() {
-  const { session } = useMockSession();
+  const { status } = useSession();
   const navigation = useNavigation();
   // 검수용: 개발 환경에서 ?episode=kakao|insta|jani로 고정하면 저장을 읽지도 쓰지도 않습니다.
   const { episode: parameter } = useLocalSearchParams<{ episode?: string }>();
@@ -73,7 +73,7 @@ export default function OnboardingRoute() {
       onWrite={() => {
         live.current.finished = true;
         record(live.current.scene, true);
-        if (session === "ready") router.push("/write");
+        if (status === "ready") router.push("/write");
         else router.push({ pathname: "/login", params: { next: "write" } });
       }}
     />

@@ -1,10 +1,11 @@
-import { useMockSession } from "@/features/auth/mock-session";
+import { useSession } from "@/features/auth/auth-session";
 import { SettingsScreen } from "@/features/settings/SettingsScreen";
 import { Redirect, router } from "expo-router";
 
 export default function SettingsRoute() {
-  const { session, cancel } = useMockSession();
-  if (session !== "ready")
+  const { status, logout } = useSession();
+  if (status === "restoring") return null;
+  if (status !== "ready")
     return (
       <Redirect href={{ pathname: "/login", params: { next: "settings" } }} />
     );
@@ -15,7 +16,7 @@ export default function SettingsRoute() {
       }
       onLegal={(kind) => router.push(`/legal/${kind}`)}
       onLogout={() => {
-        cancel();
+        void logout();
         router.dismissTo("/");
       }}
       onDeleteAccount={() => router.push("/settings/delete-account")}

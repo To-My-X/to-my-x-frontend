@@ -1,4 +1,4 @@
-import { useMockSession } from "@/features/auth/mock-session";
+import { useSession } from "@/features/auth/auth-session";
 import { FeedScreen } from "@/features/feed/FeedScreen";
 import { scenarios, type FeedScenario } from "@/features/feed/types";
 import { loadProgress } from "@/features/onboarding/progress";
@@ -7,7 +7,7 @@ import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 
 export default function FeedRoute() {
-  const { session } = useMockSession();
+  const { status } = useSession();
   const { scenario: parameter } = useLocalSearchParams<{ scenario?: string }>();
   const [sheet, setSheet] = useState<{
     storyId: string;
@@ -26,12 +26,12 @@ export default function FeedRoute() {
       <FeedScreen
         key={scenario}
         scenario={scenario}
-        onWrite={() => router.push(session === "ready" ? "/write" : "/login")}
+        onWrite={() => router.push(status === "ready" ? "/write" : "/login")}
         onBell={() => router.push("/notifications")}
         onMyTab={() => router.push("/my")}
         onShare={(story) => setSheet({ storyId: story.id, mode: "share" })}
         onMore={(story) =>
-          session === "ready"
+          status === "ready"
             ? setSheet({ storyId: story.id, mode: "manage" })
             : router.push({ pathname: "/login", params: { next: "feed" } })
         }

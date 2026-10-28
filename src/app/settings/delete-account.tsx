@@ -1,10 +1,11 @@
-import { useMockSession } from "@/features/auth/mock-session";
+import { useSession } from "@/features/auth/auth-session";
 import { DeleteAccountScreen } from "@/features/settings/DeleteAccountScreen";
 import { Redirect, router } from "expo-router";
 
 export default function DeleteAccountRoute() {
-  const { session, cancel } = useMockSession();
-  if (session !== "ready")
+  const { status, logout } = useSession();
+  if (status === "restoring") return null;
+  if (status !== "ready")
     return (
       <Redirect href={{ pathname: "/login", params: { next: "settings" } }} />
     );
@@ -14,7 +15,7 @@ export default function DeleteAccountRoute() {
         router.canGoBack() ? router.back() : router.replace("/settings")
       }
       onFinish={() => {
-        cancel();
+        void logout();
         router.dismissTo("/");
       }}
     />
