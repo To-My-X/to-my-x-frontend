@@ -1,4 +1,4 @@
-import { MockSessionProvider } from "@/features/auth/mock-session";
+import { AuthProvider } from "@/features/auth/auth-session";
 import { WritingSessionProvider } from "@/features/writing/writing-session";
 import "@/global.css";
 import { tokens } from "@/theme/tokens";
@@ -19,7 +19,7 @@ export default function RootLayout() {
   }, [loaded, error]);
   if (!loaded && !error) return null;
   return (
-    <MockSessionProvider>
+    <AuthProvider>
       <WritingSessionProvider>
         <StatusBar style="light" />
         <Stack
@@ -39,6 +39,6 @@ export default function RootLayout() {
           />
         </Stack>
       </WritingSessionProvider>
-    </MockSessionProvider>
+    </AuthProvider>
   );
 }

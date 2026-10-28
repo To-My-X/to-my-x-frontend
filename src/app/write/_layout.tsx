@@ -1,8 +1,9 @@
-import { useMockSession } from "@/features/auth/mock-session";
+import { useSession } from "@/features/auth/auth-session";
 import { Redirect, Stack } from "expo-router";
 export default function WritingLayout() {
-  const { session } = useMockSession();
-  if (session !== "ready") return <Redirect href="/login" />;
+  const { status } = useSession();
+  if (status === "restoring") return null;
+  if (status !== "ready") return <Redirect href="/login" />;
   return (
     <Stack
       screenOptions={{

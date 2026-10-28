@@ -1,19 +1,21 @@
 import { ConsentScreen } from "@/features/auth/ConsentScreen";
-import { mockAuthEnabled, useMockSession } from "@/features/auth/mock-session";
+import { useSession } from "@/features/auth/auth-session";
 import { resolveReturn } from "@/features/auth/return-target";
 import { Redirect, router, useLocalSearchParams } from "expo-router";
 import { useEffect } from "react";
 
+// 08.06 필수 동의. 동의 전에 화면을 떠나면 로그인 자체를 취소합니다.
 export default function ConsentRoute() {
-  const { session, agree, cancel, cancelPending } = useMockSession();
+  const { status, agree, cancelPending } = useSession();
   const { next } = useLocalSearchParams<{ next?: string }>();
   useEffect(() => () => cancelPending(), [cancelPending]);
-  if (!mockAuthEnabled || session === "guest")
-    return <Redirect href="/login" />;
+  if (status === "restoring") return null;
+  if (status === "ready") return <Redirect href={resolveReturn(next)} />;
+  if (status !== "pending-consent") return <Redirect href="/login" />;
   return (
     <ConsentScreen
       onCancel={() => {
-        cancel();
+        cancelPending();
         router.dismissTo("/");
       }}
       onContinue={() => {

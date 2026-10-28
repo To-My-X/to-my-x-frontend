@@ -43,6 +43,23 @@
         {
           "ios": {
             "enableSceneSupport": true
+          },
+          "android": {
+            "extraMavenRepos": [
+              "https://devrepo.kakao.com/nexus/content/groups/public/"
+            ]
+          }
+        }
+      ],
+      [
+        "@react-native-kakao/core",
+        {
+          "nativeAppKey": "cbe03dea7aab3a6cae1c3dd941ea5b63",
+          "android": {
+            "authCodeHandlerActivity": true
+          },
+          "ios": {
+            "handleKakaoOpenUrl": true
           }
         }
       ]

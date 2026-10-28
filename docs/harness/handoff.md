@@ -9,6 +9,13 @@
 - 시작 문서: [제품 명세 총괄과 화면 지도](../specs/product-overview.md)의 7장 화면 연결 골격
 - 입력 자료: [PDF 76개 목록·원문 추출·디자인 미리보기](../references/tomyx-2026-10-20/README.md). 현재 화면 59개와 LEGACY 1개를 구분했습니다.
 
+## 카카오 로그인 실연동 — 2026-10-28
+
+- 서버 Auth API(카카오 웹 코드 로그인·토큰 재발급·로그아웃)를 연동하고 mock-session을 실세션 AuthProvider(auth-session.tsx)로 교체했습니다. 상세와 redirect URI 등록 목록은 [계정 스펙](../specs/account-access.md)의 2026-10-28 기록을 따릅니다.
+- 카카오 REST API 키를 .env.local, EAS preview·production 환경, GitHub Actions 변수에 등록했습니다. 네이티브 앱 키는 app.json config plugin과 EXPO_PUBLIC_KAKAO_NATIVE_APP_KEY(.env.local, EAS preview·production)에 등록했습니다.
+- 네이티브 카카오 SDK(@react-native-kakao v2.4)를 추가해 앱 로그인(ID 토큰)을 연결했습니다. 네이티브 모듈 추가로 다음 main 머지는 새 바이너리 빌드·스토어 제출로 배포됩니다. 카카오 콘솔에 Android 패키지·키 해시, iOS 번들 ID 등록이 필요합니다(계정 스펙의 등록값 참조).
+- 검증: lint·타입·단위 테스트 17개 통과(인증 3개 포함). 로컬 웹에서 카카오 계정 페이지 진입까지 확인했으나 인가 단계에서 KOE006 발생 — redirect URI 3종(localhost·develop·prod /login)의 카카오 콘솔 등록을 서버 담당자에게 요청한 상태입니다. 등록 후 실계정 로그인 왕복을 확인합니다.
+
 ## 온보딩 시안 1:1 대조 보정 — 2026-10-27
 
 - 사용자가 제공한 15장 시안 이미지와 화면 단위로 대조해 보정했습니다: CTA를 좌우 꽉 찬 알약형(주=크림 채움·보조=어두운 채움)으로, 친구 128 아래 여백, 친구 목록의 빈 아바타 자리·하이라이트 제거·"업데이트한 프로필", 02.05 다시 친구 목록의 패널 제거(B·여운 전 장면 패널 없음으로 통일), 인스타 02.07 그리드 3장화 + 새 게시물 칸이 벌어지며 추가되는 width 애니메이션, 자니 대화방(마지막 대화 라벨·회색 말풍선·이모지)과 보내기 직전(내 말풍선 하나·회색 전송 버튼) 재구성, 여운 장면 레이아웃(서사 상단 1/3·프롬프트 하단 고정)과 서사 문구 5곳 교정.

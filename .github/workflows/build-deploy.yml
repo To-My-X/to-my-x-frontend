@@ -46,6 +46,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:web
+        env:
+          # 카카오 클라이언트 키는 브라우저에 노출되는 공개 식별자입니다.
+          EXPO_PUBLIC_KAKAO_CLIENT_ID: ${{ vars.EXPO_PUBLIC_KAKAO_CLIENT_ID }}
       - uses: actions/upload-artifact@v7
         with:
           name: web-${{ github.sha }}
