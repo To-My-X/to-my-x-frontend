@@ -10,12 +10,14 @@ export type LoginPhase = "idle" | "busy" | "failed";
 // 08.01~08.05 로그인 시트. 카카오(웹)만 실제 연동이고 Apple·Google은 공급자 설정 전 비활성입니다.
 export function LoginScreen({
   phase,
+  failDetail,
   kakaoEnabled,
   onKakao,
   onCancel,
   onMockLogin,
 }: {
   phase: LoginPhase;
+  failDetail?: string;
   kakaoEnabled: boolean;
   onKakao: () => void;
   onCancel: () => void;
@@ -39,6 +41,10 @@ export function LoginScreen({
           로그인하지{"\n"}못했어요.
         </Text>
         <Text style={f.muted}>연결을 확인하고 다시 시도해 주세요.</Text>
+        {mockAuthEnabled && failDetail ? (
+          // 테스트 배포에서 실패 원인을 현장에서 읽기 위한 표시. production 번들에는 포함되지 않습니다.
+          <Text style={f.muted}>{failDetail}</Text>
+        ) : null}
         <ActionButton label="다시 시도하기" disabled={!kakaoEnabled} onPress={onKakao} />
         <ActionButton label="먼저 둘러볼게요" onPress={onCancel} />
       </BottomSheet>

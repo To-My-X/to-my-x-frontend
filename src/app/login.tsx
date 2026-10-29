@@ -29,6 +29,7 @@ export default function LoginRoute() {
   const [phase, setPhase] = useState<LoginPhase>(
     code ? "busy" : error ? "failed" : "idle",
   );
+  const [failDetail, setFailDetail] = useState<string>();
   const [returnKey, setReturnKey] = useState<string | undefined>(next);
   const exchanged = useRef(false);
   useEffect(() => {
@@ -39,7 +40,10 @@ export default function LoginRoute() {
       if (check.next) setReturnKey(check.next);
       if (!check.valid) throw new Error("state mismatch");
       await loginWithKakaoCode(code, kakaoRedirectUri());
-    })().catch(() => setPhase("failed"));
+    })().catch((error) => {
+      setFailDetail(error instanceof Error ? error.message : String(error));
+      setPhase("failed");
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [code, state]);
   if (status === "ready") return <Redirect href={resolveReturn(returnKey)} />;
@@ -65,12 +69,14 @@ export default function LoginRoute() {
       .catch((error) => {
         // 개발 환경에서 실패 지점(SDK·토큰·서버 교환)을 구분하기 위한 로그입니다.
         if (__DEV__) console.warn("[kakao app login]", error);
+        setFailDetail(error instanceof Error ? error.message : String(error));
         setPhase(isKakaoCancel(error) ? "idle" : "failed");
       });
   };
   return (
     <LoginScreen
       phase={phase}
+      failDetail={failDetail}
       kakaoEnabled={Platform.OS === "web" ? kakaoWebReady() : kakaoNativeReady()}
       onKakao={toKakao}
       onCancel={() =>
