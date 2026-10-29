@@ -24,6 +24,23 @@ export async function kakaoNativeLogin(): Promise<{
     throw new Error(
       "kakao login returned no id token (check OpenID Connect activation)",
     );
+  if (__DEV__) {
+    // 서버 검증 실패 원인 추적용: 토큰 본문은 남기지 않고 발급 주체·대상만 확인합니다.
+    try {
+      const payload = JSON.parse(
+        globalThis.atob(
+          token.idToken.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"),
+        ),
+      );
+      console.warn("[kakao id token]", {
+        iss: payload.iss,
+        aud: payload.aud,
+        nonceMatches: payload.nonce === nonce,
+      });
+    } catch {
+      // 디코드 실패는 무시합니다.
+    }
+  }
   return { idToken: token.idToken, nonce };
 }
 
