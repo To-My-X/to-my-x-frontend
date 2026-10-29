@@ -3,10 +3,10 @@
 ## 문서 정보
 
 - 유형: 화면·기능·사용자 흐름
-- 명세 상태: 초안. 전달 자료의 동작을 반영했으며 실제 인증·세션·네이티브 연동 방식은 미정입니다.
-- 구현 상태: 화면 연결 골격 구현(mock 로그인·동의·설정·로그아웃·탈퇴). 실제 공급자·운영 동의·서버 연동은 미착수
-- 검증 상태: 일부 확인. 자료 대조 완료, 기능 검증 미실행
-- 갱신일: 2026-10-21
+- 명세 상태: 초안. 전달 자료의 동작을 반영했으며 카카오 인증·세션 방식은 2026-10-28 기록으로 확정했습니다.
+- 구현 상태: 카카오 로그인(웹 인가 코드·앱 ID 토큰)·토큰 재발급·로그아웃 서버 연동과 네이티브 영구 세션 저장(expo-secure-store) 완료. Apple·Google 로그인, 동의 서버 저장, 탈퇴 서버 연동은 미착수
+- 검증 상태: 카카오 로그인 실서버 왕복을 웹·iOS·Android에서 확인(2026-10-30). 탈퇴·운영 약관은 미검증
+- 갱신일: 2026-10-30
 - 입력 자료: Desktop `ToMyX/1. 개발명세`의 08.01–08.07, 09.01–09.06, `2. 디자인 가이드`의 08–09, `0. 정책`의 00–06. 개발명세는 `구현 기준 v1 · 2026.10.20`입니다. 파일별 출처는 [제품 명세 개요](product-overview.md)에서 관리합니다.
 - 적용 근거: 자료가 명시한 UI·실행 조건·예외·복귀를 기준으로 정리했습니다. 자료 안의 출시 1차 기본값과 과거 합의·실제 구현 완료를 구분합니다.
 - 관련 정책: [서비스 규칙](../policy/service-rules.md), [운영·출시 조건](../policy/launch-operations.md)
@@ -192,14 +192,15 @@
 서버 `https://api-tomyx.rhkr8521.com`(/api/v1/auth)와 카카오 웹 로그인을 연동했습니다.
 
 - 웹(08.01~03): 카카오 인가 코드 플로우. `scope=openid` 포함 인가 요청 → `/login` 콜백의 `code`를 `POST /api/v1/auth/login/kakao/code`로 교환합니다. state는 난수+복귀 키로 만들어 sessionStorage 보관값과 대조하고, 불일치는 실패(08.05)로 처리합니다. 성공 응답의 `newMember` 또는 이 기기의 동의 기록 부재 시 08.06 동의로 보냅니다.
-- 세션: access 토큰은 메모리, refresh 토큰·memberId·동의 여부는 `tomyx.auth.v1`(웹 localStorage, 네이티브는 세션 메모리)에 보존합니다. 앱 시작 시 refresh 회전(`POST /token/refresh`)으로 복원하고 실패하면 게스트로 시작합니다. 사용한 refresh 토큰은 재사용되지 않으므로 회전 결과를 항상 저장합니다.
+- 세션: access 토큰은 메모리, refresh 토큰·memberId·동의 여부는 `tomyx.auth.v1`(웹 localStorage, 네이티브는 expo-secure-store — iOS Keychain·Android Keystore 암호화 저장)에 보존해 앱 재시작 후에도 로그인을 유지합니다(2026-10-30). refresh 토큰은 자격 증명이라 일반 저장소 대신 보안 저장소를 사용하며, 저장 실패 시 해당 실행 동안만 메모리로 유지합니다. 네이티브 모듈 추가라 다음 main 머지는 OTA가 아닌 새 바이너리 빌드로 배포됩니다.
+- 동의 직후 세션 초기화 버그 수정(2026-10-30): 동의 화면의 이탈 취소 effect가 `cancelPending`을 의존성으로 가져, 동의로 상태가 바뀔 때마다 이전 렌더의 클로저가 cleanup으로 실행돼 방금 로그인한 세션을 `reset()`으로 지우고 로그인 시트로 되돌렸습니다(첫 동의를 거치는 모든 신규 로그인에서 재현, 사용자 보고). 언마운트 시에만 취소하고 동의·취소로 끝난 경우는 건너뛰도록 수정했습니다. iOS 시뮬레이터에서 로그인→동의→글쓰기 복귀, 강제 종료→재시작→세션 복원(로그인 라우트 즉시 통과)을 확인했습니다. 앱 시작 시 refresh 회전(`POST /token/refresh`)으로 복원하고 실패하면 게스트로 시작합니다. 사용한 refresh 토큰은 재사용되지 않으므로 회전 결과를 항상 저장합니다.
 - 로그아웃(09.04)·동의 전 이탈: `POST /logout`으로 토큰 계열을 폐기(실패해도 로컬 정리 유지)하고 게스트로 돌아갑니다.
 - 08.04 진행 중·08.05 실패 상태를 로그인 시트에 구현했습니다. Apple·Google은 공급자 설정 전 비활성입니다.
 - 클라이언트 키: `EXPO_PUBLIC_KAKAO_CLIENT_ID`(REST API 키, 공개 식별자). 로컬 `.env.local`, EAS preview·production 환경, GitHub Actions 변수(웹 빌드)에 등록했습니다. redirect URI 기본값은 `현재 origin + /login`이며 `EXPO_PUBLIC_KAKAO_REDIRECT_URI`로 재정의할 수 있습니다.
 - 카카오 콘솔 Redirect URI 등록 필요 목록(서버 담당자 전달): `http://localhost:8081/login`, `https://to-my-x--develop.expo.app/login`, `https://to-my-x.expo.app/login`. 미등록 주소에서는 카카오가 로그인 후 인가 단계에서 KOE006으로 거부합니다. 2026-10-28 로컬 확인에서 KOE006이 재현돼 세 주소 모두 등록 대기 상태입니다.
 - 앱(네이티브) 로그인(2026-10-28): `@react-native-kakao/core`·`user` v2.4를 추가하고 config plugin에 네이티브 앱 키를 설정했습니다. 네이티브의 카카오 버튼은 SDK `login({ nonce })`로 ID 토큰을 받아 `POST /login/kakao`로 교환하며, 이후 동의·복귀·토큰 보존은 웹과 동일합니다. 사용자가 로그인 창을 닫으면 실패가 아닌 취소로 처리합니다. 네이티브 모듈 추가라 다음 main 머지는 OTA가 아닌 새 바이너리 빌드로 배포됩니다. iOS 시뮬레이터에서 SDK 초기화 → 카카오 인증 세션 → 실계정 로그인까지 확인했으나 서버가 AUTH4012로 거부합니다(2026-10-28). 네이티브 SDK의 ID 토큰은 aud가 네이티브 앱 키라서, 서버의 ID 토큰 검증 허용 audience에 네이티브 앱 키 추가를 요청한 상태입니다. 서버 반영 후 클라이언트 변경 없이 동작합니다. Android 실행은 확인 대기입니다.
-- 서버 audience 반영 확인(2026-10-30): iOS 시뮬레이터에서 카카오 간편로그인 → ID 토큰 교환 → 동의(08.06) → 로그인 완료까지 실서버 왕복을 확인했습니다. Android 실기기(Play 내부 테스트)의 로그인 실패 보고는 audience 수정 이전 테스트로 추정되어 재시도 대기 중입니다. 원인 추적을 위해 실패 시트(08.05)에 에러 메시지를 표시하는 디버그 표시를 추가했으며, mock 로그인과 같은 조건(`__DEV__` 또는 `EXPO_PUBLIC_MOCK_AUTH=1`)에서만 보여 production 번들에는 포함되지 않습니다. 개발 환경에서는 ID 토큰의 iss·aud·nonce 일치 여부만 로그로 남기고 토큰 본문은 기록하지 않습니다.
-- 카카오 콘솔 Android 플랫폼 등록값: 패키지 `com.tomyx.android`, 디버그 키 해시 `cKfsac54Xj+f2JUL7K2Xvcg9+NY=`(로컬 개발용)와 EAS testing 키스토어 키 해시 `9K9n4JK9ScTJsh+kG88u0ERfOqw=`(내부 테스트 빌드용, SHA-1 F4:AF:...:3A:AC에서 변환). Play 정식 배포 시 Play 앱 서명 키의 SHA-1도 같은 방식으로 변환해 추가 등록합니다. iOS 플랫폼에는 번들 ID `com.tomyx.ios`를 등록합니다. ID 토큰 발급을 위해 카카오 로그인 OpenID Connect 활성화가 필요합니다. 필수 동의의 서버 저장 API는 아직 없어 기기 로컬 기록으로 대체합니다.
+- 서버 audience 반영 확인(2026-10-30): iOS 시뮬레이터에서 카카오 간편로그인 → ID 토큰 교환 → 동의(08.06) → 로그인 완료까지 실서버 왕복을 확인했습니다. Android 실기기(Play 내부 테스트)는 Play 앱 서명 키 해시 등록 후 사용자가 로그인 성공을 확인했습니다(2026-10-30). 이로써 카카오 로그인은 웹·iOS·Android 모두 실서버 동작을 확인했습니다. 원인 추적을 위해 실패 시트(08.05)에 에러 메시지를 표시하는 디버그 표시를 추가했으며, mock 로그인과 같은 조건(`__DEV__` 또는 `EXPO_PUBLIC_MOCK_AUTH=1`)에서만 보여 production 번들에는 포함되지 않습니다. 개발 환경에서는 ID 토큰의 iss·aud·nonce 일치 여부만 로그로 남기고 토큰 본문은 기록하지 않습니다.
+- 카카오 콘솔 Android 플랫폼 등록값: 패키지 `com.tomyx.android`, 디버그 키 해시 `cKfsac54Xj+f2JUL7K2Xvcg9+NY=`(로컬 개발용), EAS 키스토어 키 해시 `9K9n4JK9ScTJsh+kG88u0ERfOqw=`(업로드 키, APK 직접 설치용, SHA-1 F4:AF:...:3A:AC에서 변환), Play 앱 서명 키 해시 `FBQo1FB5ubtQ0wLTW3P6FlTVNDI=`(내부 테스트·스토어 설치 앱용, SHA-1 14:14:...:34:32에서 변환). Play로 설치된 앱은 Google이 앱 서명 키로 재서명하므로 업로드 키 해시만 등록하면 토큰 단계에서 `Android keyHash validation failed`로 거부됩니다(2026-10-30 내부 테스트에서 재현, 카카오톡 간편로그인은 키 해시를 로그인 창이 아닌 토큰 발급 단계에서 검증). iOS 플랫폼에는 번들 ID `com.tomyx.ios`를 등록합니다. ID 토큰 발급을 위해 카카오 로그인 OpenID Connect 활성화가 필요합니다. 필수 동의의 서버 저장 API는 아직 없어 기기 로컬 기록으로 대체합니다.
 - mock 로그인은 토큰 없는 화면 연결 검수용으로 유지합니다(개발·EAS preview 한정).
 - 서버 확인 요청(2026-10-28, 웹 로그인 차단 중): 브라우저의 CORS preflight(OPTIONS)가 401로 거부돼 코드 교환 요청이 전송되지 못합니다. 서버에서 CORS를 허용해야 합니다 — 허용 Origin `http://localhost:8081`, `https://to-my-x--develop.expo.app`, `https://to-my-x.expo.app`, 메서드 POST·OPTIONS, 헤더 Content-Type·Authorization(OPTIONS는 인증 없이 통과). 카카오 인가→콜백 복귀→실패 시트(08.05) 표시까지는 정상 동작을 확인했습니다. 네이티브 앱 로그인은 CORS와 무관합니다.
 - 검증: lint·타입·단위 테스트(ApiResponse 봉투·오류 코드·state 생성·위조 거부) 통과. 로컬 웹에서 카카오 버튼 활성화와 카카오 계정 페이지 진입을 확인했습니다(인가는 redirect URI 등록 전이라 KOE006). 실제 계정 로그인→교환→복귀와 재발급·로그아웃의 실서버 왕복은 사용자 계정으로 확인이 필요합니다.

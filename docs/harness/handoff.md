@@ -1,10 +1,17 @@
 # 인수인계
 
-## 카카오 앱 로그인 서버 반영 확인·실패 진단 — 2026-10-30
+## 카카오 앱 로그인 서버 반영·Android 키 해시 해결 — 2026-10-30
 
 - 서버가 ID 토큰 허용 audience에 네이티브 앱 키를 추가한 뒤, iOS 시뮬레이터에서 카카오 간편로그인 → 서버 교환 → 동의(08.06) 진입까지 실서버 왕복을 확인했습니다. 상세는 [계정 스펙](../specs/account-access.md)의 2026-10-30 기록을 따릅니다.
 - Android 실기기(Play 내부 테스트 versionCode 7) 로그인 실패 보고는 audience 수정 이전 테스트로 추정되어 사용자 재시도 대기 중입니다. 재시도에도 실패하면 원인을 현장에서 읽을 수 있도록 실패 시트(08.05)에 에러 메시지를 표시하는 디버그 표시(mock 로그인과 같은 활성 조건, production 제외)를 추가해 testing OTA로 전달합니다.
 - 로컬 Android 에뮬레이터 검증은 Pixel_10_Pro_Fold AVD의 에뮬레이터 프로세스 크래시(segfault)로 중단했습니다. 로컬 `android/`가 카카오 maven 저장소 반영 전 상태라 Gradle이 실패했고 `expo prebuild -p android --clean`으로 해결했습니다(CNG라 커밋 대상 아님).
+- Android 실기기 실패의 실제 원인은 카카오 콘솔에 Play 앱 서명 키 해시 미등록이었습니다(에러 상세 표시로 `Android keyHash validation failed` 확인). Play 설치 앱은 Google이 재서명하므로 업로드 키 해시만으로는 거부됩니다. 해시 3종 등록 후 사용자가 Android 로그인 성공을 확인해 카카오 로그인은 웹·iOS·Android 전부 동작합니다. 등록값은 [계정 스펙](../specs/account-access.md)을 따릅니다.
+
+## 네이티브 영구 세션 저장 — 2026-10-30
+
+- 네이티브에서 앱 재시작 시 로그인이 풀리는 문제를 expo-secure-store(iOS Keychain·Android Keystore)로 해결했습니다. `session-store.ts`가 네이티브(SecureStore 동기 API), `session-store.web.ts`가 웹(localStorage)을 담당합니다. 네이티브 모듈 추가라 다음 main 머지는 OTA가 아닌 새 바이너리 빌드·스토어 제출로 배포됩니다.
+- 온보딩 진행(`tomyx.onboarding.v1`)은 여전히 네이티브 메모리 보존(앱 재시작 시 재배정)입니다. 민감값이 아니라 보안 저장소 대상이 아니며, OPEN-05(초안·진행·숨김의 네이티브 보존 범위) 확정 시 저장 모듈을 정해 함께 전환합니다.
+- 동의 직후 세션이 초기화돼 로그인 시트로 되돌아가는 버그(사용자 보고)를 수정했습니다. 원인·수정·검증은 [계정 스펙](../specs/account-access.md)의 2026-10-30 기록과 [실수 기록](mistakes.md)을 따릅니다. iOS 시뮬레이터에서 로그인→동의→글쓰기 복귀와 강제 종료→재시작→세션 복원을 확인했고, Android 실기기 확인은 다음 바이너리 배포 후 수행합니다.
 
 ## 현재 작업
 
