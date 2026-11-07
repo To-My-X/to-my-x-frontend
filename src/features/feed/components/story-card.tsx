@@ -23,11 +23,13 @@ export const snapStart =
 export function StoryCard({
   story,
   height,
+  onReact,
   onShare,
   onMore,
 }: {
   story: Story;
   height: number;
+  onReact?: () => void;
   onShare?: () => void;
   onMore?: () => void;
 }) {
@@ -67,19 +69,34 @@ export function StoryCard({
             <Text style={styles.body}>{story.body}</Text>
           </ScrollView>
           <View style={styles.actions}>
-            <IconButton icon="heart" label="공감" caption="공감" />
+            {/* 내 글에는 공감·더보기 메뉴를 표시하지 않습니다(서버도 403으로 거부). */}
+            {!story.isMine && (
+              <IconButton
+                icon="heart"
+                label={story.reacted ? "공감 취소" : "공감"}
+                caption={
+                  story.reactionCount > 0
+                    ? story.reactionCount.toLocaleString()
+                    : "공감"
+                }
+                active={story.reacted}
+                onPress={onReact}
+              />
+            )}
             <IconButton
               icon="share"
               label="공유"
               caption="공유"
               onPress={onShare}
             />
-            <IconButton
-              icon="more"
-              label="더보기"
-              caption="더보기"
-              onPress={onMore}
-            />
+            {!story.isMine && (
+              <IconButton
+                icon="more"
+                label="더보기"
+                caption="더보기"
+                onPress={onMore}
+              />
+            )}
           </View>
         </View>
         <Text style={styles.signature}>익명의 X가 남긴 이야기</Text>

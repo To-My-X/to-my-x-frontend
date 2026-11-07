@@ -32,9 +32,11 @@ export default function ConsentRoute() {
         cancelPending();
         router.dismissTo("/");
       }}
-      onContinue={() => {
+      // 문서 보기(09.02/09.03)로 이동해도 체크 상태는 이 화면이 보존합니다.
+      onViewDocument={(kind) => router.push(`/legal/${kind}`)}
+      onAgree={async (termsVersion, privacyVersion) => {
+        await agree(termsVersion, privacyVersion);
         settled.current = true;
-        agree();
         router.replace(resolveReturn(next));
       }}
     />

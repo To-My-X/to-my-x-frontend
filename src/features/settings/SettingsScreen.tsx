@@ -6,7 +6,7 @@ import Constants from "expo-constants";
 import { useState, type ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-// 09.01 설정과 09.04 로그아웃 확인 시트입니다. 계정 값과 Push는 서버 연동 전 표시만 합니다.
+// 09.01 설정과 09.04 로그아웃 확인 시트입니다. 계정·푸시·문의 값은 서버 설정 조회 결과를 표시합니다.
 function Row({
   label,
   value,
@@ -39,11 +39,16 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 export function SettingsScreen({
+  account,
+  supportEmail,
   onBack,
   onLegal,
   onLogout,
   onDeleteAccount,
 }: {
+  // 서버 설정 조회 결과. 조회 전·실패 시에는 자리 문구를 표시합니다.
+  account?: string;
+  supportEmail?: string;
   onBack: () => void;
   onLegal: (kind: "terms" | "privacy") => void;
   onLogout: () => void;
@@ -54,15 +59,15 @@ export function SettingsScreen({
     <>
       <FlowPage title="설정" onBack={onBack}>
         <Section title="계정">
-          <Row label="Mock 계정" value="연결 확인용" />
+          <Row label="로그인 계정" value={account ?? "불러오는 중"} />
         </Section>
         <Section title="알림">
-          <Row label="푸시 알림" value="준비 중" />
+          <Row label="푸시 알림" value="미지원" />
         </Section>
         <Section title="안내">
           <Row label="이용약관" onPress={() => onLegal("terms")} />
           <Row label="개인정보 처리방침" onPress={() => onLegal("privacy")} />
-          <Row label="문의하기" value="준비 중" />
+          <Row label="문의하기" value={supportEmail ?? "불러오는 중"} />
           <Row label="버전" value={Constants.expoConfig?.version ?? "1.0.0"} />
         </Section>
         <Section title="계정 관리">

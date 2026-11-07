@@ -1,53 +1,51 @@
 import { ActionButton } from "@/components/ui/feed-actions";
 import { FlowPage, flowStyles as f } from "@/components/ui/flow-page";
 import { tokens as t } from "@/theme/tokens";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 // 08.07 로그인 전 · 06.01 빈 상태 · 06.02 내 이야기 목록입니다.
 export type MyStory = {
   id: string;
-  title: string;
-  body: string;
+  summary: string;
   postedAt: string;
+  suspended: boolean;
 };
 
 export function MyScreen({
   guest,
+  loading,
+  error,
   stories,
-  onBack,
+  hasMore,
   onLogin,
   onOpen,
+  onRetry,
+  onLoadMore,
   onSettings,
-  onStories,
 }: {
   guest: boolean;
+  loading: boolean;
+  error: boolean;
   stories: MyStory[];
-  onBack: () => void;
+  hasMore: boolean;
   onLogin: () => void;
   onOpen: (id: string) => void;
+  onRetry: () => void;
+  onLoadMore: () => void;
   onSettings: () => void;
-  onStories: () => void;
 }) {
-  const tabs = (
-    <View style={styles.tabs}>
-      <Pressable accessibilityRole="tab" onPress={onStories} style={styles.tab}>
-        <Text style={styles.tabText}>스토리</Text>
-      </Pressable>
-      <Pressable
-        accessibilityRole="tab"
-        accessibilityState={{ selected: true }}
-        style={[styles.tab, styles.selected]}
-      >
-        <Text style={styles.tabText}>MY</Text>
-      </Pressable>
-    </View>
-  );
   return (
     <FlowPage
       title="To My X"
-      onBack={onBack}
       right={!guest && <ActionButton label="설정" onPress={onSettings} />}
-      footer={tabs}
+      // 하단 고정 바(탭 레이아웃)가 콘텐츠를 가리지 않도록 자리를 비워둡니다.
+      footer={<View style={styles.barSpace} />}
     >
       {guest ? (
         <>
@@ -58,6 +56,22 @@ export function MyScreen({
             로그인한 뒤 남긴 이야기가{"\n"}이곳에 모여요.
           </Text>
           <ActionButton label="로그인하기" onPress={onLogin} />
+        </>
+      ) : loading && stories.length === 0 ? (
+        <View style={f.group}>
+          <ActivityIndicator
+            accessibilityLabel="내 이야기 불러오는 중"
+            color={t.muted}
+          />
+          <Text style={f.muted}>내 이야기를 불러오고 있어요.</Text>
+        </View>
+      ) : error && stories.length === 0 ? (
+        <>
+          <Text accessibilityRole="header" style={f.title}>
+            내 이야기를{"\n"}불러오지 못했어요.
+          </Text>
+          <Text style={f.muted}>연결을 확인하고 다시 시도해 주세요.</Text>
+          <ActionButton label="다시 불러오기" onPress={onRetry} />
         </>
       ) : stories.length === 0 ? (
         <>
@@ -87,10 +101,27 @@ export function MyScreen({
                 pressed && { opacity: 0.7 },
               ]}
             >
-              <Text style={f.text}>{story.body.split("\n")[0]}</Text>
-              <Text style={f.muted}>{story.postedAt} · 익명 공개</Text>
+              <Text style={f.text}>{story.summary}</Text>
+              <Text style={f.muted}>
+                {story.postedAt} ·{" "}
+                {story.suspended ? "공개 중단" : "익명 공개"}
+              </Text>
             </Pressable>
           ))}
+          {error && (
+            <Text accessibilityRole="alert" style={f.muted}>
+              다음 이야기를 불러오지 못했어요.
+            </Text>
+          )}
+          {(hasMore || error) && (
+            <ActionButton
+              label={
+                loading ? "불러오는 중…" : error ? "다시 불러오기" : "더 보기"
+              }
+              disabled={loading}
+              onPress={error ? onRetry : onLoadMore}
+            />
+          )}
         </>
       )}
     </FlowPage>
@@ -98,20 +129,5 @@ export function MyScreen({
 }
 const styles = StyleSheet.create({
   card: { padding: 20, gap: 12, borderRadius: 16, backgroundColor: t.surface },
-  tabs: {
-    flexDirection: "row",
-    margin: 20,
-    padding: 4,
-    borderRadius: 28,
-    backgroundColor: t.surface,
-  },
-  tab: {
-    flex: 1,
-    minHeight: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 24,
-  },
-  selected: { backgroundColor: "#7d7a70" },
-  tabText: { color: t.text, fontFamily: t.sans, fontSize: 13 },
+  barSpace: { height: 92 },
 });
