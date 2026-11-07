@@ -1,40 +1,71 @@
 import { ActionButton, Icon, IconButton } from "@/components/ui/feed-actions";
 import { tokens as t } from "@/theme/tokens";
-import { useRef, useState } from "react";
+import { useFocusEffect } from "expo-router";
+import { useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { snapStart, StoryCard } from "./components/story-card";
-import { useFeed } from "./hooks/use-feed";
+import type { Feed } from "./hooks/use-feed";
 import { initialScroll, updateScroll } from "./scroll-controls";
-import type { FeedScenario, Story } from "./types";
+import type { Story } from "./types";
 
 export function FeedScreen({
-  scenario,
-  onWrite,
+  feed,
+  bellDot = false,
   onBell,
-  onMyTab,
+  onReact,
   onShare,
   onMore,
 }: {
-  scenario: FeedScenario;
-  onWrite?: () => void;
+  feed: Feed;
+  bellDot?: boolean;
   onBell?: () => void;
-  onMyTab?: () => void;
+  onReact?: (story: Story) => void;
   onShare?: (story: Story) => void;
   onMore?: (story: Story) => void;
 }) {
-  const feed = useFeed(scenario);
   const insets = useSafeAreaInsets();
   const [height, setHeight] = useState(812);
   const [hidden, setHidden] = useState(false);
   const scroll = useRef(initialScroll);
+  const listRef = useRef<FlatList<Story>>(null);
+  const focused = useRef(true);
+  // 웹은 탭이 숨겨질 때(display:none) 브라우저가 스크롤 위치를 버리므로, 복귀 시 추적해 둔 위치로 복원합니다.
+  useFocusEffect(
+    useCallback(() => {
+      focused.current = true;
+      // 포커스 직후엔 화면이 아직 display:none이라 적용될 때까지 몇 프레임 재시도합니다.
+      const y = scroll.current.y;
+      let frame = 0;
+      let tries = 20;
+      const restore = () => {
+        scroll.current = { ...scroll.current, y, anchor: y, direction: 0 };
+        listRef.current?.scrollToOffset({ offset: y, animated: false });
+        const node = listRef.current?.getScrollableNode() as
+          | { scrollTop?: number }
+          | number
+          | null
+          | undefined;
+        const applied =
+          typeof node !== "object" ||
+          node === null ||
+          typeof node.scrollTop !== "number" ||
+          Math.abs(node.scrollTop - y) <= 1;
+        if (!applied && --tries > 0) frame = requestAnimationFrame(restore);
+      };
+      if (y > 0) frame = requestAnimationFrame(restore);
+      return () => {
+        cancelAnimationFrame(frame);
+        focused.current = false;
+      };
+    }, []),
+  );
   return (
     <View style={styles.outer}>
       <View
@@ -42,6 +73,7 @@ export function FeedScreen({
         onLayout={(event) => setHeight(event.nativeEvent.layout.height)}
       >
         <FlatList
+          ref={listRef}
           testID="feed-list"
           data={feed.items}
           keyExtractor={(item) => item.id}
@@ -49,6 +81,7 @@ export function FeedScreen({
             <StoryCard
               story={item}
               height={height}
+              onReact={onReact && (() => onReact(item))}
               onShare={onShare && (() => onShare(item))}
               onMore={onMore && (() => onMore(item))}
             />
@@ -72,6 +105,8 @@ export function FeedScreen({
           onEndReachedThreshold={0.5}
           scrollEventThrottle={16}
           onScroll={(event) => {
+            // 탭이 숨겨지는 순간 브라우저가 쏘는 0 스크롤 이벤트로 추적 위치가 깨지지 않게 합니다.
+            if (!focused.current) return;
             const next = updateScroll(
               scroll.current,
               event.nativeEvent.contentOffset.y,
@@ -155,48 +190,14 @@ export function FeedScreen({
           <Text style={styles.brand}>To My X</Text>
           {!hidden && (
             <View style={styles.bell}>
-              <IconButton icon="bell" label="알림" onPress={onBell} />
+              <IconButton
+                icon="bell"
+                label={bellDot ? "알림 · 안 읽은 알림 있음" : "알림"}
+                badge={bellDot}
+                onPress={onBell}
+              />
             </View>
           )}
-        </View>
-        <View
-          pointerEvents="box-none"
-          style={[styles.footer, { bottom: insets.bottom + 20 }]}
-        >
-          <View style={styles.navigation}>
-            {!hidden && (
-              <>
-                <IconButton icon="mute" label="소리 꺼짐" />
-                <View style={styles.tabs}>
-                  <Pressable
-                    disabled
-                    accessibilityRole="tab"
-                    accessibilityState={{ selected: true, disabled: true }}
-                    style={[styles.tab, styles.selected]}
-                  >
-                    <Text style={styles.tabText}>스토리</Text>
-                  </Pressable>
-                  <Pressable
-                    disabled={!onMyTab}
-                    onPress={onMyTab}
-                    accessibilityRole="tab"
-                    accessibilityState={{ disabled: !onMyTab }}
-                    style={styles.tab}
-                  >
-                    <Text style={styles.tabText}>MY</Text>
-                  </Pressable>
-                </View>
-              </>
-            )}
-          </View>
-          <IconButton
-            icon="plus"
-            label="이야기 쓰기"
-            bright
-            onPress={
-              feed.error && feed.items.length === 0 ? undefined : onWrite
-            }
-          />
         </View>
       </View>
     </View>
@@ -226,38 +227,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   bell: { position: "absolute", right: 0 },
-  footer: {
-    position: "absolute",
-    left: 20,
-    right: 20,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  navigation: {
-    minHeight: 52,
-    flex: 1,
-    flexDirection: "row",
-    gap: 12,
-    alignItems: "center",
-  },
-  tabs: {
-    flex: 1,
-    flexDirection: "row",
-    padding: 4,
-    borderRadius: 28,
-    backgroundColor: t.surface,
-    minHeight: 50,
-  },
-  tab: {
-    flex: 1,
-    minHeight: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 24,
-  },
-  selected: { backgroundColor: "#7d7a70" },
-  tabText: { color: t.text, fontFamily: t.sans, fontSize: 13 },
   status: { paddingHorizontal: t.gutter, justifyContent: "center", gap: 22 },
   statusIcon: {
     width: 60,

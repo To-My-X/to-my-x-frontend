@@ -1,6 +1,10 @@
 import type { FeedPage, FeedScenario, Story } from "../types";
 
-const stories: Omit<Story, "id">[] = [
+// 개발 전용 검수 fixture. 실제 서버 커서와 같은 모양(string | null)을 사용합니다.
+const stories: Omit<
+  Story,
+  "id" | "reactionCount" | "reacted" | "isMine"
+>[] = [
   {
     title: "마지막 네 자리가\n기억나지 않더라.",
     body: "퇴근길에 우리가 듣던 노래가 나왔어.\n무심코 네 번호를 눌러봤는데,\n마지막 네 자리가 기억나지 않더라.\n나도 조금씩 잊고 있었나 봐.",
@@ -22,51 +26,56 @@ const stories: Omit<Story, "id">[] = [
 
 export function createMockFeed(scenario: FeedScenario, delay = 550) {
   const failed = new Set<number>();
-  return async (cursor: number, signal: AbortSignal): Promise<FeedPage> => {
+  return async (
+    cursor: string | null,
+    signal?: AbortSignal,
+  ): Promise<FeedPage> => {
+    const offset = cursor ? Number(cursor) : 0;
     await new Promise<void>((resolve, reject) => {
       let timer: ReturnType<typeof setTimeout> | undefined;
       const abort = () => {
         clearTimeout(timer);
         reject(new Error("aborted"));
       };
-      if (signal.aborted) {
+      if (signal?.aborted) {
         abort();
         return;
       }
-      signal.addEventListener("abort", abort, { once: true });
+      signal?.addEventListener("abort", abort, { once: true });
       if (scenario !== "loading")
         timer = setTimeout(() => {
-          signal.removeEventListener("abort", abort);
+          signal?.removeEventListener("abort", abort);
           resolve();
         }, delay);
     });
     if (
-      ((scenario === "error" && cursor === 0) ||
-        (scenario === "pagination-error" && cursor === 20)) &&
-      !failed.has(cursor)
+      ((scenario === "error" && offset === 0) ||
+        (scenario === "pagination-error" && offset === 20)) &&
+      !failed.has(offset)
     ) {
-      failed.add(cursor);
+      failed.add(offset);
       throw new Error("mock request failed");
     }
     if (scenario === "empty") return { items: [], next: null };
     const items = Array.from(
-      { length: Math.min(20, 60 - cursor) },
-      (_, offset) => {
-        const index = cursor + offset;
-        const story = stories[index % stories.length];
+      { length: Math.min(20, 60 - offset) },
+      (_, index) => {
+        const position = offset + index;
+        const story = stories[position % stories.length];
         return {
           ...story,
-          id: `mock-${index}`,
+          id: `mock-${position}`,
+          reactionCount: position % 7,
+          reacted: false,
+          isMine: false,
           body:
-            scenario === "long-text" && index === 0
+            scenario === "long-text" && position === 0
               ? Array(12).fill(story.body).join("\n\n")
               : story.body,
         };
       },
     );
-    return {
-      items,
-      next: cursor + items.length < 60 ? cursor + items.length : null,
-    };
+    const end = offset + items.length;
+    return { items, next: end < 60 ? String(end) : null };
   };
 }

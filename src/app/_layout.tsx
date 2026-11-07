@@ -1,4 +1,5 @@
 import { AuthProvider } from "@/features/auth/auth-session";
+import { mergeGuestHidden } from "@/features/posts/api";
 import { WritingSessionProvider } from "@/features/writing/writing-session";
 import "@/global.css";
 import { tokens } from "@/theme/tokens";
@@ -19,7 +20,8 @@ export default function RootLayout() {
   }, [loaded, error]);
   if (!loaded && !error) return null;
   return (
-    <AuthProvider>
+    // 로그인·복원 완료 직후 게스트 숨김을 계정으로 병합합니다(서버 정책: 로그인 직후 1회).
+    <AuthProvider onAuthenticated={() => void mergeGuestHidden()}>
       <WritingSessionProvider>
         <StatusBar style="light" />
         <Stack

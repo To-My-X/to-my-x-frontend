@@ -18,9 +18,6 @@ export function ConfirmScreen({
       </Text>
       <ActionButton label="익명으로 남기기" onPress={onSubmit} />
       <ActionButton label="돌아가서 수정하기" onPress={onEdit} />
-      <Text style={f.muted}>
-        지금은 화면 연결을 확인하는 단계입니다. 실제 이야기는 게시되지 않습니다.
-      </Text>
     </FlowPage>
   );
 }

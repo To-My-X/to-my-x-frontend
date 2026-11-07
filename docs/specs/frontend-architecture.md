@@ -79,7 +79,7 @@ src/
 
 ### 기존 코드 적용
 
-현재는 Expo 템플릿 화면이 `src/app/index.tsx`, `src/app/explore.tsx`에 있고 공통 코드가 components·hooks·constants에 있습니다. 설계 문서가 생겼다는 이유로 이 파일들을 일괄 이동하지 않습니다.
+남은 Expo 템플릿 화면은 `src/app/explore.tsx`이고 템플릿 공통 코드가 components·hooks·constants에 있습니다(제품 라우트는 features 구조로 전환 완료, 스토리·MY는 `src/app/(tabs)/`의 탭 그룹). 설계 문서가 생겼다는 이유로 남은 템플릿 파일을 일괄 이동하지 않습니다.
 
 - 새 제품 기능부터 features 구조를 적용합니다.
 - 기존 템플릿 화면을 제품 화면으로 대체할 때 화면 본문과 전용 코드를 해당 기능으로 옮깁니다.

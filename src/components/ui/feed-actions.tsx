@@ -18,10 +18,12 @@ export function Icon({
   name,
   color = t.text,
   size = 24,
+  filled = false,
 }: {
   name: IconName;
   color?: string;
   size?: number;
+  filled?: boolean;
 }) {
   return (
     <Svg
@@ -40,7 +42,7 @@ export function Icon({
           <Circle key={cx} cx={cx} cy={12} r={1} fill={color} />
         ))
       ) : (
-        <Path d={paths[name]} />
+        <Path d={paths[name]} fill={filled ? color : "none"} />
       )}
     </Svg>
   );
@@ -50,6 +52,8 @@ export function IconButton({
   label,
   caption,
   bright = false,
+  active = false,
+  badge = false,
   onPress,
 }: {
   onPress?: () => void;
@@ -57,6 +61,10 @@ export function IconButton({
   label: string;
   caption?: string;
   bright?: boolean;
+  // 선택 상태(예: 공감한 글의 하트 채움)
+  active?: boolean;
+  // 우상단 점(예: 안 읽은 알림)
+  badge?: boolean;
 }) {
   return (
     <View style={styles.action}>
@@ -65,10 +73,15 @@ export function IconButton({
         disabled={!onPress}
         accessibilityRole="button"
         accessibilityLabel={label}
-        accessibilityState={{ disabled: !onPress }}
+        accessibilityState={{ disabled: !onPress, selected: active }}
         style={[styles.icon, bright && styles.bright]}
       >
-        <Icon name={icon} color={bright ? t.background : t.text} />
+        <Icon
+          name={icon}
+          color={bright ? t.background : t.text}
+          filled={active}
+        />
+        {badge && <View style={styles.badge} />}
       </Pressable>
       {caption && <Text style={styles.caption}>{caption}</Text>}
     </View>
@@ -112,6 +125,15 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(48,45,39,0.45)",
   },
   bright: { backgroundColor: t.text, borderColor: t.text },
+  badge: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#d8b98a",
+  },
   caption: { color: t.muted, fontSize: 11, fontFamily: t.sans },
   button: {
     minHeight: 48,
